@@ -3,10 +3,11 @@
 
 #include "message.h"
 
-#include <netcoworkprovider.h>
-
 #include <QObject>
 #include <QDataStream>
+
+
+class NetCoworkFactory;
 
 
 class NetCoworker : public QObject
@@ -14,21 +15,22 @@ class NetCoworker : public QObject
     Q_OBJECT
 
 public:
-    NetCoworker(NetCoworkProvider*, uint32_t class_id, uint32_t object_id);
+    NetCoworker(const NetCoworkFactory* _factory, uint32_t object_id);
 
     virtual void handle_call(Message& msg) = 0;
 
+    [[deprecated]]
     uint32_t get_class_id() const;
+
     uint32_t get_object_id() const;
 
-    virtual void sync() = 0;
+    const NetCoworkFactory* get_factory() const;
 
 protected:
-    void send_call(Message& msg) const;
+    void send_func_call(Message& msg) const;
 
 private:
-    NetCoworkProvider* provider;
-    uint32_t class_id = UINT32_MAX;
+    const NetCoworkFactory* factory;
     uint32_t object_id = UINT32_MAX;
 };
 

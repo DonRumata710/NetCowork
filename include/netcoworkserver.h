@@ -12,7 +12,10 @@ class NetCoworkServer : public QTcpServer, public NetCoworkProvider
     Q_OBJECT
 
 public:
-    NetCoworkServer(const QHostAddress& address, uint16_t port);
+    NetCoworkServer();
+
+    virtual void start(const std::string& address, uint16_t port) override;
+    virtual void stop() override;
 
 public slots:
     void onNewConnection();
@@ -21,6 +24,7 @@ public slots:
 
 protected:
     virtual void send_data(Message& data) override;
+    virtual bool is_server() override;
 
 private:
     void send_data(const QByteArray& data);
