@@ -72,30 +72,33 @@
     };
 
 
-#define STR_TO_ENUM_VAL(VAL) { #VAL, VAL },
-#define STR_TO_ENUM_VAL_WITH_NAMES(VAL, STR) { STR, VAL },
-#define STR_TO_ENUM_VAL_WITH_VAL(NAME, VAL) { #NAME, NAME },
-#define STR_TO_ENUM_VAL_WITH_VAL_NAMES(NAME, VAL, STR) { STR, NAME },
+#define DECLARE_STR_TO_ENUM(VAL) { #VAL, VAL },
+#define DECLARE_STR_TO_ENUM_WITH_NAMES(VAL, STR) { STR, VAL },
+#define DECLARE_STR_TO_ENUM_WITH_VAL(NAME, VAL) { #NAME, NAME },
+#define DECLARE_STR_TO_ENUM_WITH_VAL_NAMES(NAME, VAL, STR) { STR, NAME },
+#define DECLARE_STR_TO_ENUM_WITH_NAMES_VAL(NAME, STR, VAL) { STR, NAME },
 
+
+#define STR_TO_ENUM_DELC(NAME) extern std::unordered_map<std::string, int> NAME##_from_str;
 
 #define STR_TO_ENUM(NAME) \
-    std::unordered_map<std::string, NAME##_enum> NAME##_from_str = { \
-        NAME(STR_TO_ENUM_VAL) \
+    std::unordered_map<std::string, int> NAME##_from_str = { \
+        NAME(DECLARE_STR_TO_ENUM) \
     };
 
 #define STR_TO_ENUM_WTIH_VAL(NAME) \
-    std::unordered_map<std::string, NAME##_enum> NAME##_from_str = { \
-        NAME(STR_TO_ENUM_VAL_WITH_VAL) \
+    std::unordered_map<std::string, int> NAME##_from_str = { \
+        NAME(DECLARE_STR_TO_ENUM_WITH_VAL) \
     };
 
 #define STR_TO_ENUM_WITH_NAMES(NAME) \
-    std::unordered_map<std::string, NAME##_enum> NAME##_from_str = { \
-        NAME(STR_TO_ENUM_VAL_WITH_NAMES) \
+    std::unordered_map<std::string, int> NAME##_from_str = { \
+        NAME(DECLARE_STR_TO_ENUM_WITH_NAMES) \
     };
 
 #define STR_TO_ENUM_WITH_VAL_NAMES(NAME) \
-    std::unordered_map<std::string, NAME##_enum> NAME##_from_str = { \
-        NAME(STR_TO_ENUM_VAL_WITH_VAL_NAMES) \
+    std::unordered_map<std::string, int> NAME##_from_str = { \
+        NAME(DECLARE_STR_TO_ENUM_WITH_VAL_NAMES) \
     };
 
 

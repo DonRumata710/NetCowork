@@ -3,22 +3,27 @@
 #include <unordered_map>
 
 
-static std::unordered_map<std::string, SimpleType> types = {
-    { "ui64",   SimpleType(Type_enum::UI64  ) },
-    { "ui32",   SimpleType(Type_enum::UI32  ) },
-    { "ui16",   SimpleType(Type_enum::UI16  ) },
-    { "ui8",    SimpleType(Type_enum::UI8   ) },
-    { "i64",    SimpleType(Type_enum::I64   ) },
-    { "i32",    SimpleType(Type_enum::I32   ) },
-    { "i16",    SimpleType(Type_enum::I16   ) },
-    { "i8",     SimpleType(Type_enum::I8    ) },
-    { "char",   SimpleType(Type_enum::CHAR  ) },
-    { "string", SimpleType(Type_enum::STRING) }
-};
-
-
 InterfaceModel::InterfaceModel()
-{}
+{
+    types = {
+        { "ui64",   SimpleType(Type_enum::UI64  ) },
+        { "ui32",   SimpleType(Type_enum::UI32  ) },
+        { "ui16",   SimpleType(Type_enum::UI16  ) },
+        { "ui8",    SimpleType(Type_enum::UI8   ) },
+        { "i64",    SimpleType(Type_enum::I64   ) },
+        { "i32",    SimpleType(Type_enum::I32   ) },
+        { "i16",    SimpleType(Type_enum::I16   ) },
+        { "i8",     SimpleType(Type_enum::I8    ) },
+        { "char",   SimpleType(Type_enum::CHAR  ) },
+        { "string", SimpleType(Type_enum::STRING) }
+    };
+}
+
+void InterfaceModel::print(Printer& printer)
+{
+    for (const auto& c : classes)
+        printer.print_class(c);
+}
 
 
 template<typename T, typename Alloc, template <typename, typename> class Container>

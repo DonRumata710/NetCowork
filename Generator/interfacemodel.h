@@ -5,6 +5,7 @@
 #include "struct.h"
 #include "enum.h"
 #include "simpletypeelement.h"
+#include "printer.h"
 
 #include <set>
 
@@ -13,6 +14,8 @@ class InterfaceModel
 {
 public:
     InterfaceModel();
+
+    void print(Printer& printer);
 
     const CodeElement* get_type(const std::string& type) const;
 
@@ -33,6 +36,8 @@ private:
     std::vector<Struct> structs;
     std::vector<Enum> enums;
     std::vector<Function> functions;
+
+    std::unordered_map<std::string, SimpleType> types;
 };
 
 #endif // INTERFACEMODEL_H

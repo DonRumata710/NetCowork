@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "parser.h"
+#include "printer.h"
 
 
 int main(int argc, char** argv)
@@ -32,7 +33,16 @@ int main(int argc, char** argv)
     if (output_folder.empty())
         output_folder = ".";
 
-    Parser g(input, output_folder);
+    try
+    {
+        Parser g(input, output_folder);
+        Printer p(output_folder);
+        g.parse().print(p);
+    }
+    catch (const std::exception& err)
+    {
+        std::cerr << err.what();
+    }
 
     return 0;
 }

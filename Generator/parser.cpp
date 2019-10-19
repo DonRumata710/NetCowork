@@ -8,16 +8,16 @@
 #include <sstream>
 
 
-static std::unordered_map<std::string, Token_enum> tokens = {
-    { "class", Token_enum::CLASS },
-    { "struct", Token_enum::STRUCT },
-    { "enum", Token_enum::ENUM },
-    { "function", Token_enum::FUNCTION },
-    { "{", Token_enum::OPENING_BRACE },
-    { "}", Token_enum::CLOSING_BRACE },
-    { "(", Token_enum::OPENING_PARENTHESIS },
-    { ")", Token_enum::CLOSING_PARENTHESIS }
-};
+//static std::unordered_map<std::string, Token_enum> tokens = {
+//    { "class", Token_enum::CLASS },
+//    { "struct", Token_enum::STRUCT },
+//    { "enum", Token_enum::ENUM },
+//    { "function", Token_enum::FUNCTION },
+//    { "{", Token_enum::OPENING_BRACE },
+//    { "}", Token_enum::CLOSING_BRACE },
+//    { "(", Token_enum::OPENING_PARENTHESIS },
+//    { ")", Token_enum::CLOSING_PARENTHESIS }
+//};
 
 
 Parser::Parser(const std::vector<std::string>& _start_files, const std::string& _output_folder) :
@@ -55,25 +55,28 @@ bool Parser::parse_file(FileHandler& current_handler)
         if (word.empty())
             break;
 
-        auto it_token = tokens.find(word);
-        if (it_token == tokens.end())
+        auto it_token = Token_from_str.find(word);
+        if (it_token == Token_from_str.end())
+        {
+            std::cout << "unknown symbol";
             return false;
+        }
 
         switch(it_token->second)
         {
-        case Token_enum::CLASS:
+        case TOKEN_CLASS:
             if (!parse_class(model.add_class(Class(handler->next_word()))))
                 return false;
             break;
-        case Token_enum::STRUCT:
+        case TOKEN_STRUCT:
             if (!parse_struct(model.add_struct(Struct(handler->next_word()))))
                 return false;
             break;
-        case Token_enum::ENUM:
+        case TOKEN_ENUM:
             if (!parse_enum(model.add_enumeration(Enum(handler->next_word()))))
                 return false;
             break;
-        case Token_enum::FUNCTION:
+        case TOKEN_FUNCTION:
             if (!parse_function(model.add_function(Function(handler->next_word()))))
                 return false;
             break;
@@ -88,8 +91,8 @@ bool Parser::parse_file(FileHandler& current_handler)
 
 bool Parser::parse_class(Class* current_class)
 {
-    auto it_token = tokens.find(handler->next_word());
-    if (it_token->second != Token_enum::OPENING_BRACE)
+    auto it_token = Token_from_str.find(handler->next_word());
+    if (it_token->second != TOKEN_OPENING_BRACE)
     {
         std::cout << "wrong syntax after class declaration '" << current_class->get_name() << "'";
         return false;
@@ -99,28 +102,46 @@ bool Parser::parse_class(Class* current_class)
     {
         std::string word = handler->next_word();
 
-        it_token = tokens.find(word);
-        if (it_token->second == Token_enum::CLOSING_BRACE)
+        it_token = Token_from_str.find(word);
+        if (it_token != Token_from_str.end())
         {
-            break;
-        }
-        else if (it_token->second == Token_enum::FUNCTION)
-        {
-            Function func(handler->next_word());
-            if (!parse_function(&func))
-                return false;
-            current_class->add_function(func);
+            if (it_token->second == TOKEN_CLOSING_BRACE)
+            {
+                break;
+            }
+            else if (it_token->second == TOKEN_FUNCTION)
+            {
+                Function func(handler->next_word());
+                if (!parse_function(&func))
+                {
+                    std::cout << " in class '" << current_class->get_name() << "'";
+                    return false;
+                }
+                current_class->add_function(func);
+            }
         }
         else
         {
             const CodeElement* type = model.get_type(word);
             if (type == nullptr)
             {
-                std::cout << "unknown type";
+                std::cout << "unknown parameter type in class '" << current_class->get_name() << "'";
                 return false;
             }
             current_class->add_member({ type, handler->next_word() });
+
+            it_token = Token_from_str.find(handler->next_word());
+            if (it_token == Token_from_str.end() || it_token->second != TOKEN_SEMICOLON)
+            {
+                std::cout << "unexpected symbol after parameter of class '" << current_class->get_name() << "', ';' expected";
+            }
         }
+    }
+
+    it_token = Token_from_str.find(handler->next_word());
+    if (it_token == Token_from_str.end() || it_token->second != TOKEN_SEMICOLON)
+    {
+        std::cout << "unexpected symbol after delaration of class '" << current_class->get_name() << "', ';' expected";
     }
 
     return true;
@@ -128,8 +149,8 @@ bool Parser::parse_class(Class* current_class)
 
 bool Parser::parse_function(Function* current_function)
 {
-    auto it_token = tokens.find(handler->next_word());
-    if (it_token->second != Token_enum::OPENING_PARENTHESIS)
+    auto it_token = Token_from_str.find(handler->next_word());
+    if (it_token->second != TOKEN_OPENING_PARENTHESIS)
     {
         std::cout << "wrong syntax after function declaration '" << current_function->get_name() << "'";
         return false;
@@ -139,8 +160,8 @@ bool Parser::parse_function(Function* current_function)
     {
         std::string word = handler->next_word();
 
-        it_token = tokens.find(word);
-        if (it_token->second == Token_enum::CLOSING_PARENTHESIS)
+        it_token = Token_from_str.find(word);
+        if (it_token != Token_from_str.end() && it_token->second == TOKEN_CLOSING_PARENTHESIS)
         {
             break;
         }
@@ -149,17 +170,35 @@ bool Parser::parse_function(Function* current_function)
             const CodeElement* type = model.get_type(word);
             if (type == nullptr)
             {
-                std::cout << "unknown type of " << current_function->get_params_count() + 1 << " argument of function " << current_function->get_name();
+                std::cout << "unknown type of " << current_function->get_params_count() + 1 << " argument of function '" << current_function->get_name() << "'";
                 return false;
             }
             current_function->add_param({ type, handler->next_word() });
 
-            it_token = tokens.find(handler->next_word());
-            if (it_token->second != Token_enum::COMMA)
+            it_token = Token_from_str.find(handler->next_word());
+            if (it_token == Token_from_str.end())
             {
-                std::cout << "unexpected symbol after " << current_function->get_params_count() << " argument of function " << current_function->get_name();
+                std::cout << "unknown symbol after " << current_function->get_params_count() << " argument of function '" << current_function->get_name() << "'";
+                return false;
+            }
+
+            if (it_token->second == TOKEN_CLOSING_PARENTHESIS)
+            {
+                break;
+            }
+
+            if (it_token->second != TOKEN_COMMA)
+            {
+                std::cout << "unexpected symbol after " << current_function->get_params_count() << " argument of function '" << current_function->get_name() << "'";
+                return false;
             }
         }
+    }
+
+    it_token = Token_from_str.find(handler->next_word());
+    if (it_token == Token_from_str.end() || it_token->second != TOKEN_SEMICOLON)
+    {
+        std::cout << "unexpected symbol after delaration of function '" << current_function->get_name() << "', ';' expected";
     }
 
     return true;
@@ -167,8 +206,8 @@ bool Parser::parse_function(Function* current_function)
 
 bool Parser::parse_struct(Struct* current_struct)
 {
-    auto it_token = tokens.find(handler->next_word());
-    if (it_token->second != Token_enum::OPENING_BRACE)
+    auto it_token = Token_from_str.find(handler->next_word());
+    if (it_token->second != TOKEN_OPENING_BRACE)
     {
         std::cout << "wrong syntax after struct declaration '" << current_struct->get_name() << "'";
         return false;
@@ -178,8 +217,8 @@ bool Parser::parse_struct(Struct* current_struct)
     {
         std::string word = handler->next_word();
 
-        it_token = tokens.find(word);
-        if (it_token->second == Token_enum::CLOSING_BRACE)
+        it_token = Token_from_str.find(word);
+        if (it_token->second == TOKEN_CLOSING_BRACE)
         {
             break;
         }
@@ -195,13 +234,19 @@ bool Parser::parse_struct(Struct* current_struct)
         }
     }
 
+    it_token = Token_from_str.find(handler->next_word());
+    if (it_token == Token_from_str.end() || it_token->second != TOKEN_SEMICOLON)
+    {
+        std::cout << "unexpected symbol after delaration of struct '" << current_struct->get_name() << "', ';' expected";
+    }
+
     return true;
 }
 
 bool Parser::parse_enum(Enum* current_enum)
 {
-    auto it_token = tokens.find(handler->next_word());
-    if (it_token->second != Token_enum::OPENING_BRACE)
+    auto it_token = Token_from_str.find(handler->next_word());
+    if (it_token->second != TOKEN_OPENING_BRACE)
     {
         std::cout << "unexpected symbol after enum declaration '" << current_enum->get_name() << "'";
         return false;
@@ -212,27 +257,33 @@ bool Parser::parse_enum(Enum* current_enum)
     {
         std::string word = handler->next_word();
 
-        it_token = tokens.find(word);
-        if (it_token->second == Token_enum::CLOSING_BRACE)
+        it_token = Token_from_str.find(word);
+        if (it_token->second == TOKEN_CLOSING_BRACE)
         {
             break;
         }
         else
         {
             std::string name = handler->next_word();
-            it_token = tokens.find(handler->next_word());
-            if (it_token->second == Token_enum::ASSIGNMENT)
+            it_token = Token_from_str.find(handler->next_word());
+            if (it_token->second == TOKEN_ASSIGNMENT)
             {
                 value = atoi(handler->next_word().c_str());
-                it_token = tokens.find(handler->next_word());
+                it_token = Token_from_str.find(handler->next_word());
             }
-            if (it_token->second != Token_enum::COMMA)
+            if (it_token->second != TOKEN_COMMA)
             {
                 std::cout << "unexpected symbol in enum definition '" << current_enum->get_name() << "'";
                 return false;
             }
             current_enum->add_value(name, value++);
         }
+    }
+
+    it_token = Token_from_str.find(handler->next_word());
+    if (it_token == Token_from_str.end() || it_token->second != TOKEN_SEMICOLON)
+    {
+        std::cout << "unexpected symbol after delaration of enumeration '" << current_enum->get_name() << "', ';' expected";
     }
 
     return true;

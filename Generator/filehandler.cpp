@@ -6,19 +6,30 @@
 FileHandler::FileHandler(const std::string& file) :
     file_stream(file),
     filename(file)
-{}
+{
+    std::getline(file_stream, line);
+    line_stream = std::istringstream(line);
+}
 
 bool FileHandler::is_open() const
 {
     return file_stream.is_open();
 }
 
+bool FileHandler::is_end() const
+{
+    return !file_stream.good();
+}
+
 std::string FileHandler::next_word()
 {
-    if (word.empty())
+    while (word.empty())
     {
         if (!line_stream.good())
         {
+            if (!file_stream.good())
+                return "";
+
             ++line_num;
             std::getline(file_stream, line);
             line_stream = std::istringstream(line);
@@ -36,8 +47,7 @@ std::string FileHandler::next_word()
             size_t i = 0;
             do
             {
-                num.push_back(word[i]);
-                ++i;
+                num.push_back(word[i++]);
             }
             while(isdigit(word[i]));
             word.erase(0, i);
@@ -53,9 +63,9 @@ std::string FileHandler::next_word()
         size_t i = 0;
         do
         {
-            res.push_back(word[i]);
+            res.push_back(word[i++]);
         }
-        while (isalnum(word[i]));
+        while (isalnum(word[i]) || word[i] == '_');
 
         word.erase(0, i);
         return res;

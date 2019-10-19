@@ -12,6 +12,8 @@ public:
 
     bool is_open() const;
 
+    bool is_end() const;
+
     std::string next_word();
 
     const std::string& get_filename() const;

@@ -8,13 +8,15 @@ Class::Class(const std::string& name) :
 Class::Class(const Class& other) :
     CodeElement (other),
     members(other.members),
-    functions(other.functions)
+    functions(other.functions),
+    dependencies(other.dependencies)
 {}
 
 Class::Class(Class&& other) :
     CodeElement (std::move(other)),
     members(std::move(other.members)),
-    functions(std::move(other.functions))
+    functions(std::move(other.functions)),
+    dependencies(std::move(other.dependencies))
 {}
 
 void Class::add_member(const Parameter& new_member)

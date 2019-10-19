@@ -5,20 +5,22 @@
 
 
 #define Token(DO) \
-    DO(CLASS) \
-    DO(STRUCT) \
-    DO(ENUM) \
-    DO(FUNCTION) \
-    DO(OPENING_BRACE) \
-    DO(CLOSING_BRACE) \
-    DO(OPENING_PARENTHESIS) \
-    DO(CLOSING_PARENTHESIS) \
-    DO(COMMA) \
-    DO(ASSIGNMENT) \
-    DO(NONE)
+    DO(TOKEN_CLASS, "class") \
+    DO(TOKEN_STRUCT, "struct") \
+    DO(TOKEN_ENUM, "enum") \
+    DO(TOKEN_FUNCTION, "function") \
+    DO(TOKEN_OPENING_BRACE, "{") \
+    DO(TOKEN_CLOSING_BRACE, "}") \
+    DO(TOKEN_OPENING_PARENTHESIS, "(") \
+    DO(TOKEN_CLOSING_PARENTHESIS, ")") \
+    DO(TOKEN_COMMA, ",") \
+    DO(TOKEN_ASSIGNMENT, "=") \
+    DO(TOKEN_SEMICOLON, ";") \
+    DO(TOKEN_NONE, "")
 
 
-ENUM_C(Token)
+ENUM_WITH_NAMES(Token)
+STR_TO_ENUM_DELC(Token)
 
 
 //enum class Token
