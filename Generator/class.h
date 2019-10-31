@@ -2,6 +2,7 @@
 #define CLASS_H
 
 #include "function.h"
+#include "property.h"
 
 #include <vector>
 #include <set>
@@ -14,21 +15,21 @@ public:
     Class(const Class& other);
     Class(Class&& other);
 
-    void add_member(const Parameter& type);
-    void add_member(Parameter&& type);
+    void add_property(const Property& type);
+    void add_property(Property&& type);
     void add_function(const Function& func);
     void add_function(Function&& func);
 
     const std::set<const CodeElement*>& get_dependencies() const;
 
+    const std::vector<Property>& get_properties() const;
     const std::vector<Function>& get_functions() const;
-    const std::vector<Parameter>& get_members() const;
 
 private:
     void add_dependencies(const Function& func);
 
 private:
-    std::vector<Parameter> members;
+    std::vector<Property> properties;
     std::vector<Function> functions;
     std::set<const CodeElement*> dependencies;
 };

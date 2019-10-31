@@ -7,28 +7,28 @@ Class::Class(const std::string& name) :
 
 Class::Class(const Class& other) :
     CodeElement (other),
-    members(other.members),
+    properties(other.properties),
     functions(other.functions),
     dependencies(other.dependencies)
 {}
 
 Class::Class(Class&& other) :
     CodeElement (std::move(other)),
-    members(std::move(other.members)),
+    properties(std::move(other.properties)),
     functions(std::move(other.functions)),
     dependencies(std::move(other.dependencies))
 {}
 
-void Class::add_member(const Parameter& new_member)
+void Class::add_property(const Property &property)
 {
-    dependencies.insert(new_member.element);
-    members.push_back(new_member);
+    dependencies.insert(property.parameter.element);
+    properties.push_back(property);
 }
 
-void Class::add_member(Parameter&& new_member)
+void Class::add_property(Property&& property)
 {
-    dependencies.insert(new_member.element);
-    members.emplace_back(std::move(new_member));
+    dependencies.insert(property.parameter.element);
+    properties.emplace_back(std::move(property));
 }
 
 void Class::add_function(const Function& func)
@@ -48,14 +48,14 @@ const std::set<const CodeElement*>& Class::get_dependencies() const
     return dependencies;
 }
 
+const std::vector<Property>& Class::get_properties() const
+{
+    return properties;
+}
+
 const std::vector<Function>& Class::get_functions() const
 {
     return functions;
-}
-
-const std::vector<Parameter>& Class::get_members() const
-{
-    return members;
 }
 
 void Class::add_dependencies(const Function& func)

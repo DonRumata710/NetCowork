@@ -9,6 +9,8 @@
     DO(TOKEN_STRUCT, "struct") \
     DO(TOKEN_ENUM, "enum") \
     DO(TOKEN_FUNCTION, "function") \
+    DO(TOKEN_GETTER, "get") \
+    DO(TOKEN_SETTER, "set") \
     DO(TOKEN_OPENING_BRACE, "{") \
     DO(TOKEN_CLOSING_BRACE, "}") \
     DO(TOKEN_OPENING_PARENTHESIS, "(") \
@@ -16,6 +18,7 @@
     DO(TOKEN_COMMA, ",") \
     DO(TOKEN_ASSIGNMENT, "=") \
     DO(TOKEN_SEMICOLON, ";") \
+    DO(TOKEN_COLON, ":") \
     DO(TOKEN_NONE, "")
 
 

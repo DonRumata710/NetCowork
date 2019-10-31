@@ -34,6 +34,8 @@ private:
     bool parse_struct(Struct* current_struct);
     bool parse_enum(Enum* current_enum);
 
+    bool parse_property(Property& property);
+
 private:
     std::vector<std::string> start_files;
     std::string output_folder;

@@ -14,6 +14,7 @@ SOURCES += \
         main.cpp \
         parser.cpp \
         printer.cpp \
+        property.cpp \
         simpletypeelement.cpp \
         struct.cpp \
         types.cpp
@@ -29,6 +30,7 @@ HEADERS += \
     parameter.h \
     parser.h \
     printer.h \
+    property.h \
     simpletypeelement.h \
     struct.h \
     types.h

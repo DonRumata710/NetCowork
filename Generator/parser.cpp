@@ -128,7 +128,11 @@ bool Parser::parse_class(Class* current_class)
                 std::cout << "unknown parameter type in class '" << current_class->get_name() << "'";
                 return false;
             }
-            current_class->add_member({ type, handler->next_word() });
+
+            Property prop;
+            prop.parameter = { type, handler->next_word() };
+            parse_property(prop);
+            current_class->add_property(prop);
 
             it_token = Token_from_str.find(handler->next_word());
             if (it_token == Token_from_str.end() || it_token->second != TOKEN_SEMICOLON)
@@ -198,7 +202,7 @@ bool Parser::parse_function(Function* current_function)
     it_token = Token_from_str.find(handler->next_word());
     if (it_token == Token_from_str.end() || it_token->second != TOKEN_SEMICOLON)
     {
-        std::cout << "unexpected symbol after delaration of function '" << current_function->get_name() << "', ';' expected";
+        std::cout << "unexpected symbol after delaration of function '" << current_function->get_name() << "', expected ';'";
     }
 
     return true;
@@ -284,6 +288,78 @@ bool Parser::parse_enum(Enum* current_enum)
     if (it_token == Token_from_str.end() || it_token->second != TOKEN_SEMICOLON)
     {
         std::cout << "unexpected symbol after delaration of enumeration '" << current_enum->get_name() << "', ';' expected";
+    }
+
+    return true;
+}
+
+bool Parser::parse_property(Property& property)
+{
+    auto it_token = Token_from_str.find(handler->next_word());
+    if (it_token->second != TOKEN_OPENING_BRACE)
+    {
+        std::cout << "wrong syntax in declaration of property '" << property.parameter.value_name << "'";
+        return false;
+    }
+
+    it_token = Token_from_str.find(handler->next_word());
+    if (it_token == Token_from_str.end())
+    {
+        std::cout << "wrong syntax in declaration of property '" << property.parameter.value_name << "', expected 'get' or 'set'";
+        return false;
+    }
+
+    while(true)
+    {
+        if (it_token->second == Token_enum::TOKEN_GETTER)
+        {
+            it_token = Token_from_str.find(handler->next_word());
+            if (it_token == Token_from_str.end())
+            {
+                std::cout << "wrong syntax in declaration of getter '" << property.parameter.value_name << "', expected ':'";
+                return false;
+            }
+
+            property.getter = handler->next_word();
+        }
+        else if (it_token->second == Token_enum::TOKEN_SETTER)
+        {
+            it_token = Token_from_str.find(handler->next_word());
+            if (it_token == Token_from_str.end())
+            {
+                std::cout << "wrong syntax in declaration of setter '" << property.parameter.value_name << "', expected ':'";
+                return false;
+            }
+
+            property.getter = handler->next_word();
+        }
+        else
+        {
+            std::cout << "unexpected symbol in declaration of property '" << property.parameter.value_name << "', expected 'get' or 'set'";
+            return false;
+        }
+
+        it_token = Token_from_str.find(handler->next_word());
+        if (it_token == Token_from_str.end())
+        {
+            std::cout << "wrong syntax in declaration of property '" << property.parameter.value_name << "'";
+            return false;
+        }
+
+        if (it_token->second == TOKEN_CLOSING_BRACE)
+            break;
+
+        if (it_token->second == TOKEN_COMMA)
+            continue;
+
+        std::cout << "unexpected symbol in declaration of property '" << property.parameter.value_name << "'";
+        return false;
+    }
+
+    it_token = Token_from_str.find(handler->next_word());
+    if (it_token == Token_from_str.end() || it_token->second != TOKEN_SEMICOLON)
+    {
+        std::cout << "unexpected symbol after delaration of property '" << property.parameter.value_name << "', expected ';'";
     }
 
     return true;
