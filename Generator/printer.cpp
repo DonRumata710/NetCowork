@@ -26,7 +26,7 @@ bool Printer::print_class(const Class& c)
     std::string sync_function = sync_class + "::";
 
 
-    current_file = std::ofstream(path + c.get_name() + ".h");
+    current_file = std::ofstream(path + c.get_name() + "_net.h");
     if (!current_file.is_open())
     {
         std::cerr << "file opening failure";
