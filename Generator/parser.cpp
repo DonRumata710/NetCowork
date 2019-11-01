@@ -138,6 +138,7 @@ bool Parser::parse_class(Class* current_class)
             if (it_token == Token_from_str.end() || it_token->second != TOKEN_SEMICOLON)
             {
                 std::cout << "unexpected symbol after parameter of class '" << current_class->get_name() << "', ';' expected";
+                return false;
             }
         }
     }
@@ -146,6 +147,7 @@ bool Parser::parse_class(Class* current_class)
     if (it_token == Token_from_str.end() || it_token->second != TOKEN_SEMICOLON)
     {
         std::cout << "unexpected symbol after delaration of class '" << current_class->get_name() << "', ';' expected";
+        return false;
     }
 
     return true;
