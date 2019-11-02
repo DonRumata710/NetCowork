@@ -47,7 +47,12 @@ const CodeElement* InterfaceModel::get_type(const std::string& type_name) const
         return &it->second;
     }
 
-    const CodeElement* type = find_type(classes, type_name);
+    const CodeElement* type;
+    type = find_type(dependencies, type_name);
+    if (type)
+        return type;
+
+    type = find_type(classes, type_name);
     if (type)
         return type;
 
@@ -60,6 +65,12 @@ const CodeElement* InterfaceModel::get_type(const std::string& type_name) const
         return type;
 
     return nullptr;
+}
+
+Dependency* InterfaceModel::add_dependency(const Dependency& dependency)
+{
+    dependencies.push_back(dependency);
+    return &*dependencies.rbegin();
 }
 
 Class* InterfaceModel::add_class(const Class& new_class)

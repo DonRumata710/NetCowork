@@ -3,6 +3,7 @@
 
 #include "function.h"
 #include "property.h"
+#include "dependency.h"
 
 #include <vector>
 #include <set>
@@ -15,6 +16,7 @@ public:
     Class(const Class& other);
     Class(Class&& other);
 
+    void add_dependency(const Dependency* dependency);
     void add_property(const Property& type);
     void add_property(Property&& type);
     void add_function(const Function& func);

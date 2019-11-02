@@ -41,31 +41,38 @@ bool Printer::print_class(const Class& c)
 
     for (const auto& dependency : c.get_dependencies())
     {
-        switch (dependency->get_type())
+        if (dependency->get_module().empty())
         {
-        case Type_enum::UI64:
-        case Type_enum::UI32:
-        case Type_enum::UI16:
-        case Type_enum::UI8:
-        case Type_enum::I64:
-        case Type_enum::I32:
-        case Type_enum::I16:
-        case Type_enum::I8:
-            print_dependency("cstdint");
-            break;
-        case Type_enum::CHAR:
-            break;
-        case Type_enum::STRING:
-            print_dependency("string");
-            break;
-        case Type_enum::FUNCTION:
-        case Type_enum::STRUCT:
-        case Type_enum::CLASS:
-        case Type_enum::ENUM:
-            print_dependency(dependency->get_name() + ".h");
-            break;
-        default:
-            std::logic_error("unknown type in printer");
+            switch (dependency->get_type())
+            {
+            case Type_enum::UI64:
+            case Type_enum::UI32:
+            case Type_enum::UI16:
+            case Type_enum::UI8:
+            case Type_enum::I64:
+            case Type_enum::I32:
+            case Type_enum::I16:
+            case Type_enum::I8:
+                print_dependency("cstdint");
+                break;
+            case Type_enum::CHAR:
+                break;
+            case Type_enum::STRING:
+                print_dependency("string");
+                break;
+            case Type_enum::FUNCTION:
+            case Type_enum::STRUCT:
+            case Type_enum::CLASS:
+            case Type_enum::ENUM:
+                print_dependency(dependency->get_name() + ".h");
+                break;
+            default:
+                throw std::logic_error("unknown type in printer");
+            }
+        }
+        else
+        {
+            print_dependency(dependency->get_module());
         }
     }
 
@@ -81,7 +88,7 @@ bool Printer::print_class(const Class& c)
 
     print_line("");
 
-    start_class(sync_class, "NetCoworker", "i" + c.get_name());
+    start_class(sync_class, "NetCoworker");
 
     print_line(sync_class + "(const " + processor_class + "<" + c.get_name() + ">* _proc, uint32_t object_id, " + c.get_name() + "* obj);");
 

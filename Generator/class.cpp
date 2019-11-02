@@ -19,6 +19,11 @@ Class::Class(Class&& other) :
     dependencies(std::move(other.dependencies))
 {}
 
+void Class::add_dependency(const Dependency* dependency)
+{
+    dependencies.insert(dependency);
+}
+
 void Class::add_property(const Property &property)
 {
     dependencies.insert(property.parameter.element);

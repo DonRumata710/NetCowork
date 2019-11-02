@@ -5,6 +5,7 @@
 
 
 #define Token(DO) \
+    DO(TOKEN_IMPORT, "import") \
     DO(TOKEN_CLASS, "class") \
     DO(TOKEN_STRUCT, "struct") \
     DO(TOKEN_ENUM, "enum") \
@@ -19,6 +20,7 @@
     DO(TOKEN_ASSIGNMENT, "=") \
     DO(TOKEN_SEMICOLON, ";") \
     DO(TOKEN_COLON, ":") \
+    DO(TOKEN_DOT, ".") \
     DO(TOKEN_NONE, "")
 
 

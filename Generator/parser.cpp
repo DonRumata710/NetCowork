@@ -64,6 +64,10 @@ bool Parser::parse_file(FileHandler& current_handler)
 
         switch(it_token->second)
         {
+        case TOKEN_IMPORT:
+            if (!parse_dependency())
+                return false;
+            break;
         case TOKEN_CLASS:
             if (!parse_class(model.add_class(Class(handler->next_word()))))
                 return false;
@@ -85,6 +89,61 @@ bool Parser::parse_file(FileHandler& current_handler)
             return false;
         }
     }
+
+    return true;
+}
+
+bool Parser::parse_dependency()
+{
+    auto it_token = Token_from_str.find(handler->next_word());
+    if (it_token == Token_from_str.end())
+    {
+        std::cout << "unexpected symbol after import";
+        return false;
+    }
+
+    Type_enum type;
+
+    switch(it_token->second)
+    {
+    case TOKEN_CLASS:
+        type = Type_enum::CLASS;
+        break;
+    case TOKEN_STRUCT:
+        type = Type_enum::STRUCT;
+        break;
+    case TOKEN_ENUM:
+        type = Type_enum::ENUM;
+        break;
+    }
+
+    std::string file_name = handler->next_word();
+    std::string type_name = file_name;
+
+    it_token = Token_from_str.find(handler->next_word());
+    if (it_token == Token_from_str.end())
+    {
+        std::cout << "unexpected symbol after import";
+        return false;
+    }
+
+    if (it_token->second == TOKEN_DOT)
+    {
+        type_name = handler->next_word();
+    }
+    else if (it_token->second != TOKEN_SEMICOLON)
+    {
+        std::cout << "unexpected symbol after import '" << type_name << "', ';' or '.' expected";
+    }
+
+    it_token = Token_from_str.find(handler->next_word());
+    if (it_token == Token_from_str.end() || it_token->second != TOKEN_SEMICOLON)
+    {
+        std::cout << "unexpected symbol after import '" << type_name << "', ';' expected";
+        return false;
+    }
+
+    model.add_dependency(Dependency(file_name, type_name, type));
 
     return true;
 }

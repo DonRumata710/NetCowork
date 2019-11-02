@@ -29,6 +29,7 @@ private:
     bool parse_file(FileHandler& handler);
     bool parse_word(std::string& word);
 
+    bool parse_dependency();
     bool parse_class(Class* current_class);
     bool parse_function(Function* current_function);
     bool parse_struct(Struct* current_struct);

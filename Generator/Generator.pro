@@ -6,6 +6,7 @@ CONFIG -= qt
 SOURCES += \
         class.cpp \
         codeelement.cpp \
+        dependency.cpp \
         enum.cpp \
         enumtest.cpp \
         filehandler.cpp \
@@ -22,6 +23,7 @@ SOURCES += \
 HEADERS += \
     class.h \
     codeelement.h \
+    dependency.h \
     enum.h \
     enumutil.h \
     filehandler.h \
