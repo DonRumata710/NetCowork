@@ -38,7 +38,7 @@ InterfaceModel Parser::parse()
 
         if (!parse_file(file))
         {
-            std::cout << " line " << file.get_line_num() << " in file " << filename << " \n";
+            std::cout << " - line " << file.get_line_num() << " in file " << filename << " \n";
             return model;
         }
     }
@@ -190,15 +190,11 @@ bool Parser::parse_class(Class* current_class)
 
             Property prop;
             prop.parameter = { type, handler->next_word() };
-            parse_property(prop);
-            current_class->add_property(prop);
 
-            it_token = Token_from_str.find(handler->next_word());
-            if (it_token == Token_from_str.end() || it_token->second != TOKEN_SEMICOLON)
-            {
-                std::cout << "unexpected symbol after parameter of class '" << current_class->get_name() << "', ';' expected";
+            if (!parse_property(prop))
                 return false;
-            }
+
+            current_class->add_property(prop);
         }
     }
 
@@ -366,7 +362,7 @@ bool Parser::parse_property(Property& property)
     it_token = Token_from_str.find(handler->next_word());
     if (it_token == Token_from_str.end())
     {
-        std::cout << "wrong syntax in declaration of property '" << property.parameter.value_name << "', expected 'get' or 'set'";
+        std::cout << "wrong syntax of property declaration '" << property.parameter.value_name << "', expected 'get' or 'set', got '" << it_token->first << "'";
         return false;
     }
 
@@ -377,7 +373,7 @@ bool Parser::parse_property(Property& property)
             it_token = Token_from_str.find(handler->next_word());
             if (it_token == Token_from_str.end())
             {
-                std::cout << "wrong syntax in declaration of getter '" << property.parameter.value_name << "', expected ':'";
+                std::cout << "wrong syntax in declaration of getter '" << property.parameter.value_name << "', expected ':', got '" << it_token->first << "'";
                 return false;
             }
 
@@ -388,15 +384,15 @@ bool Parser::parse_property(Property& property)
             it_token = Token_from_str.find(handler->next_word());
             if (it_token == Token_from_str.end())
             {
-                std::cout << "wrong syntax in declaration of setter '" << property.parameter.value_name << "', expected ':'";
+                std::cout << "wrong syntax in declaration of setter '" << property.parameter.value_name << "', expected ':', got '" << it_token->first << "'";
                 return false;
             }
 
-            property.getter = handler->next_word();
+            property.setter = handler->next_word();
         }
         else
         {
-            std::cout << "unexpected symbol in declaration of property '" << property.parameter.value_name << "', expected 'get' or 'set'";
+            std::cout << "unexpected symbol in declaration of property '" << property.parameter.value_name << "', expected 'get' or 'set', got '" << it_token->first << "'";
             return false;
         }
 
@@ -411,7 +407,10 @@ bool Parser::parse_property(Property& property)
             break;
 
         if (it_token->second == TOKEN_COMMA)
+        {
+            it_token = Token_from_str.find(handler->next_word());
             continue;
+        }
 
         std::cout << "unexpected symbol in declaration of property '" << property.parameter.value_name << "'";
         return false;

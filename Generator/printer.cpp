@@ -23,7 +23,7 @@ bool Printer::print_class(const Class& c)
 {
     std::string processor_class = c.get_name() + "Processor";
     std::string sync_class = c.get_name() + "Sync";
-    std::string sync_function = sync_class + "::";
+    std::string sync_function = sync_class + "<" + c.get_name() + ">::";
 
 
     current_file = std::ofstream(path + c.get_name() + "_net.h");
@@ -91,6 +91,7 @@ bool Printer::print_class(const Class& c)
     start_class(sync_class, "NetCoworker");
 
     print_line(sync_class + "(const " + processor_class + "<" + c.get_name() + ">* _proc, uint32_t object_id, " + c.get_name() + "* obj);");
+    print_line("");
 
     size_t counter = 1;
 
@@ -127,7 +128,7 @@ bool Printer::print_class(const Class& c)
         const Property& property = c.get_properties()[i];
         std::string parameter = c.get_properties()[i].parameter.value_name;
 
-        print_function("void", property.setter, { property.parameter }, false, sync_class);
+        print_function("void", property.setter, { property.parameter }, false);
         print_line("{");
         increase_offset();
         print_line("impl->" + property.setter + "(" + parameter + ");");
@@ -139,7 +140,7 @@ bool Printer::print_class(const Class& c)
         print_line("}");
         print_line("");
 
-        print_function(property.parameter.element, property.getter, {}, true, sync_class);
+        print_function(property.parameter.element, property.getter, {}, true);
         print_line("{");
         increase_offset();
         print_line("return impl->" + property.getter + "();");
@@ -201,9 +202,8 @@ bool Printer::print_class(const Class& c)
             get_value_line += "string";
             break;
         case Type_enum::CLASS:
-        case Type_enum::STRUCT:
         case Type_enum::FUNCTION:
-            throw std::logic_error("Not implemented yet");
+            throw std::logic_error("Not trivial properties are not implemented yet");
         default:
             get_value_line += "value<" + get_type_name(property->parameter.element) + ">";
         }
@@ -230,14 +230,15 @@ bool Printer::print_class(const Class& c)
     print_line("private:");
     increase_offset();
 
-    print_line("Interface* impl = nullptr;");
+    print_line(c.get_name() + "* impl = nullptr;");
 
     finish_class();
 
 
     start_class(c.get_name() + "Processor", "NetCoworkFactory");
 
-    print_line("typedef " + sync_class + " SyncObj;");
+    print_line("typedef " + sync_class + "<" + c.get_name() + "> SyncObj;");
+    print_line("");
 
     print_line(current_class + "(NetCoworkProvider* _provider) :");
     increase_offset();
@@ -331,6 +332,8 @@ bool Printer::print_class(const Class& c)
     finish_class();
 
 
+    print_line("");
+    print_line("template<class " + c.get_name() + ">");
     print_line(sync_function + sync_class + "(const " + processor_class + "<" + c.get_name() + ">* _proc, uint32_t object_id, " + c.get_name() + "* obj) :");
     increase_offset();
     print_line("NetCoworker(_proc, object_id),");
@@ -466,4 +469,5 @@ void Printer::finish_class()
 {
     decrease_offset();
     print_line("};");
+    print_line("");
 }
