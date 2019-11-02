@@ -1,7 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QPushButton>
+#include <netcoworkprovider.h>
+
 #include <QMouseEvent>
 #include <QApplication>
 
@@ -15,58 +16,11 @@ QMainWindow* getMainWindow()
 }
 
 
-class NetObject : public iNetObject
+
+template<>
+QPushButton* NetObjectProcessor<QPushButton>::generate_object() const
 {
-public:
-    NetObject()
-    {}
-
-    virtual void setPos(int32_t x, int32_t y) override
-    {
-        btn->move(x, y);
-    }
-
-    virtual void set_x(int32_t new_x) override
-    {
-        btn->move(new_x, btn->y());
-    }
-
-    virtual void set_y(int32_t new_y) override
-    {
-        btn->move(btn->y(), new_y);
-    }
-
-    virtual void set_button_name(const std::string& button) override
-    {
-        btn = getMainWindow()->findChild<QPushButton*>(button.c_str());
-    }
-
-    virtual int32_t get_x() const override
-    {
-        return btn->x();
-    }
-
-    virtual int32_t get_y() const override
-    {
-        return btn->y();
-    }
-
-    virtual std::string get_button_name() const override
-    {
-        if (btn)
-            return btn->objectName().toStdString();
-        else
-            return "";
-    }
-
-private:
-    QPushButton* btn = nullptr;
-};
-
-
-iNetObject* NetObjectProcessor::generate_object() const
-{
-    return new NetObject;
+    return getMainWindow()->findChild<QPushButton*>("pushButton");
 }
 
 
@@ -74,7 +28,7 @@ MainWindow::MainWindow(NetCoworkProvider* _provider, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     provider(_provider),
-    nop(provider->register_new_class<NetObjectProcessor>())
+    nop(provider->register_new_class<NetObjectProcessor<QPushButton>>())
 {
     ui->setupUi(this);
 

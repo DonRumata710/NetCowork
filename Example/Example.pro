@@ -26,15 +26,11 @@ CONFIG += c++17
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp \
-        generated/NetObjectprocessor.cpp \
-        generated/NetObjectsync.cpp
+        mainwindow.cpp
 
 HEADERS += \
         mainwindow.h \
-        generated/NetObject.h \
-        generated/NetObjectprocessor.h \
-        generated/NetObjectsync.h
+        generated/NetObject_net.h
 
 INCLUDEPATH += \
     $$PWD/../include \
