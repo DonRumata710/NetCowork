@@ -26,7 +26,7 @@ private:
 
     std::string filename;
 
-    size_t line_num = 0;
+    size_t line_num = 1;
     std::string line;
 };
 
