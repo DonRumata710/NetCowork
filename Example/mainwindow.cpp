@@ -36,6 +36,10 @@ MainWindow::MainWindow(NetCoworkProvider* _provider, QWidget *parent) :
     {
         obj = nop->get_object();
     }
+
+    provider->set_add_object_callback([this](NetCoworker* p_obj, uint32_t class_id, uint32_t obj_id){
+        obj = dynamic_cast<decltype(obj)>(p_obj);
+    });
 }
 
 MainWindow::~MainWindow()

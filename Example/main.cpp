@@ -5,9 +5,17 @@
 
 #include <QApplication>
 
+#include <iostream>
+
 
 int main(int argc, char *argv[])
-{    
+{
+    if (argc != 2)
+    {
+        std::cout << "server or client?";
+        return 1;
+    }
+
     QApplication a(argc, argv);
 
     NetCoworkProvider* provider;

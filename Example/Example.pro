@@ -40,7 +40,8 @@ FORMS += \
         mainwindow.ui
 
 netcowork.target = generated/netobject_net.h
-netcowork.commands = $$OUT_PWD/../Generator/release/Generator -i $$PWD/netobject.nc -o generated
+CONFIG(release, debug|release): netcowork.commands = $$OUT_PWD/../Generator/release/Generator -i $$PWD/netobject.nc -o generated
+CONFIG(debug, debug|release): netcowork.commands = $$OUT_PWD/../Generator/debug/Generator -i $$PWD/netobject.nc -o generated
 QMAKE_EXTRA_TARGETS += netcowork
 PRE_TARGETDEPS += generated/netobject_net.h
 

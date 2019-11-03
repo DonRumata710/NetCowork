@@ -14,6 +14,11 @@ void NetCoworkProvider::add_object(NetCoworker *object)
     coworkers.push_back(object);
 }
 
+void NetCoworkProvider::set_add_object_callback(std::function<void(NetCoworker*, uint32_t, uint32_t)> func)
+{
+    callback = func;
+}
+
 void NetCoworkProvider::parse_message(const QByteArray& message)
 {
     uint32_t class_id = *(reinterpret_cast<uint32_t*>(message.mid(0, 4).data()));
@@ -90,5 +95,6 @@ void NetCoworkProvider::process_func(uint32_t class_id, uint32_t object_id, Mess
         coworkers.push_back(coworker);
         if (msg.get_value<uint32_t>() == 0)
             factories[class_id]->sync(coworker, msg);
+        callback(coworker, class_id, object_id);
     }
 }

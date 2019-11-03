@@ -3,6 +3,8 @@
 
 #include "message.h"
 
+#include <functional>
+
 
 class NetCoworker;
 class NetCoworkFactory;
@@ -30,6 +32,8 @@ public:
 
     virtual bool is_server() = 0;
 
+    void set_add_object_callback(std::function<void (NetCoworker*, uint32_t, uint32_t)> func);
+
 protected:
     virtual void send_data(Message& data) = 0;
     void parse_message(const QByteArray& message);
@@ -39,6 +43,9 @@ protected:
 
     NetCoworker* get_object(uint32_t i) const;
     uint32_t object_count();
+
+protected:
+    std::function<void (NetCoworker*, uint32_t, uint32_t)> callback;
 
 private:
     void add_new_factory(NetCoworkFactory* factory);
