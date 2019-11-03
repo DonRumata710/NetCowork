@@ -3,6 +3,6 @@ TEMPLATE = subdirs
 SUBDIRS = \
     Generator \
     NetCowork \
-    Example
+    Examples
 
-Example.depends = NetCowork
+Examples.depends = NetCowork
