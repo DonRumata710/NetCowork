@@ -30,7 +30,7 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
-        generated/NetObject_net.h
+        $$OUT_PWD/generated/NetObject_net.h
 
 INCLUDEPATH += \
     $$PWD/../include \
@@ -38,6 +38,11 @@ INCLUDEPATH += \
 
 FORMS += \
         mainwindow.ui
+
+netcowork.target = generated/netobject_net.h
+netcowork.commands = $$OUT_PWD/../Generator/release/Generator -i $$PWD/netobject.nc -o generated
+QMAKE_EXTRA_TARGETS += netcowork
+PRE_TARGETDEPS += generated/netobject_net.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

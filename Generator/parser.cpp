@@ -8,18 +8,6 @@
 #include <sstream>
 
 
-//static std::unordered_map<std::string, Token_enum> tokens = {
-//    { "class", Token_enum::CLASS },
-//    { "struct", Token_enum::STRUCT },
-//    { "enum", Token_enum::ENUM },
-//    { "function", Token_enum::FUNCTION },
-//    { "{", Token_enum::OPENING_BRACE },
-//    { "}", Token_enum::CLOSING_BRACE },
-//    { "(", Token_enum::OPENING_PARENTHESIS },
-//    { ")", Token_enum::CLOSING_PARENTHESIS }
-//};
-
-
 Parser::Parser(const std::vector<std::string>& _start_files, const std::string& _output_folder) :
     start_files(_start_files),
     output_folder(_output_folder)
