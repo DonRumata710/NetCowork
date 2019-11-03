@@ -5,5 +5,6 @@ import struct QPoint.QPoint;
 
 class NetObject
 {
-    QPoint position { get: getPos, set: move };
+    QPoint position { get: pos, set: move };
 };
+

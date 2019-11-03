@@ -35,7 +35,6 @@ MainWindow::MainWindow(NetCoworkProvider* _provider, QWidget *parent) :
     if (provider->is_server())
     {
         obj = nop->get_object();
-        obj->set_button_name(ui->pushButton->objectName().toStdString());
     }
 }
 
@@ -54,7 +53,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent* event)
 
     if (ui->pushButton->isChecked())
     {
-        obj->setPos(event->x(), event->y());
+        obj->move(event->pos());
     }
     QMainWindow::mouseMoveEvent(event);
 }

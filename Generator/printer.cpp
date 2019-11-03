@@ -230,6 +230,12 @@ bool Printer::print_class(const Class& c)
     print_line("private:");
     increase_offset();
 
+    print_line("friend class " + processor_class + "<" + c.get_name() + ">;");
+    print_line("");
+
+    print_line(c.get_name() + "* get_impl() { return impl; }");
+    print_line("");
+
     print_line(c.get_name() + "* impl = nullptr;");
 
     finish_class();
@@ -250,7 +256,7 @@ bool Printer::print_class(const Class& c)
     print_line("SyncObj* get_object()");
     print_line("{");
     increase_offset();
-    print_line("uint32_t cnt = counter++;");
+    print_line("uint32_t cnt = get_counter()++;");
     print_line("Message m;");
     print_line("m.add_value(cnt);");
     print_line("send_func_call(m);");
@@ -260,10 +266,19 @@ bool Printer::print_class(const Class& c)
     decrease_offset();
     print_line("}");
     print_line("");
+
+    decrease_offset();
+    print_line("");
+    print_line("private:");
+    increase_offset();
+
+    print_line(c.get_name() + "* generate_object() const;");
+    print_line("");
+
     print_line("NetCoworker* create_object(uint32_t object_id) const");
     print_line("{");
     increase_offset();
-    print_line("counter = object_id + 1;");
+    print_line("get_counter() = object_id + 1;");
     print_line("auto* obj = new " + sync_class + "(this, object_id, generate_object());");
     print_line("return obj;");
     decrease_offset();
@@ -321,13 +336,15 @@ bool Printer::print_class(const Class& c)
 
     decrease_offset();
     print_line("}");
-
-    decrease_offset();
     print_line("");
-    print_line("private:");
-    increase_offset();
 
-    print_line("static uint32_t counter;");
+    print_line("static uint32_t& get_counter()");
+    print_line("{");
+    increase_offset();
+    print_line("static uint32_t counter = 0;");
+    print_line("return counter;");
+    decrease_offset();
+    print_line("}");
 
     finish_class();
 

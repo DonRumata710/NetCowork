@@ -3,7 +3,7 @@
 
 #include <QPushButton>
 #include <QMainWindow>
-#include "generated/NetObjectsync.h"
+#include "generated/NetObject_net.h"
 
 
 namespace Ui {
