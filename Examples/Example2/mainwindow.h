@@ -1,9 +1,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QPushButton>
+#include <netcoworkprovider.h>
+
 #include <QMainWindow>
-#include "generated/NetObject_net.h"
+#include <QAbstractButton>
+#include <QHostAddress>
 
 
 namespace Ui {
@@ -19,20 +21,24 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(NetCoworkProvider* _provider, QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 private slots:
-    void on_bStart_clicked(bool checked);
+    void on_bStart_clicked();
 
-private:
-    virtual void mouseMoveEvent(QMouseEvent *event) override;
+    void on_bSettings_clicked();
+
+    void on_bExit_clicked();
+
+    void on_buttonBox_accepted();
+
+    void on_buttonBox_clicked(QAbstractButton *button);
 
 private:
     Ui::MainWindow *ui;
-    NetCoworkProvider* provider;
-    NetObjectSync<QPushButton>* obj = nullptr;
-    NetObjectProcessor<QPushButton>* nop = nullptr;
+
+    QHostAddress address;
 };
 
 #endif // MAINWINDOW_H

@@ -25,12 +25,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++17
 
 SOURCES += \
+        ball.cpp \
+        game.cpp \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+        platform.cpp
 
 HEADERS += \
+        ball.h \
+        game.h \
         mainwindow.h \
-        $$OUT_PWD/generated/NetObject_net.h
+        $$OUT_PWD/generated/Ball_net.h \
+        $$OUT_PWD/generated/Platform_net.h \
+        platform.h
 
 INCLUDEPATH += \
     $$PWD/../include \
@@ -40,8 +47,9 @@ FORMS += \
         mainwindow.ui
 
 netcowork.target = generated/netobject_net.h
-CONFIG(release, debug|release): netcowork.commands = $$OUT_PWD/../../Generator/release/Generator -i $$PWD/netobject.nc -o generated
-CONFIG(debug, debug|release): netcowork.commands = $$OUT_PWD/../../Generator/debug/Generator -i $$PWD/netobject.nc -o generated
+netcowork.depends = $$PWD/netobjects.nc
+CONFIG(release, debug|release): netcowork.commands = $$OUT_PWD/../../Generator/release/Generator -i $$PWD/netobjects.nc -o generated
+CONFIG(debug, debug|release): netcowork.commands = $$OUT_PWD/../../Generator/debug/Generator -i $$PWD/netobjects.nc -o generated
 QMAKE_EXTRA_TARGETS += netcowork
 PRE_TARGETDEPS += generated/netobject_net.h
 

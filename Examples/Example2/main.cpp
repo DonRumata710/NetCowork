@@ -10,25 +10,9 @@
 
 int main(int argc, char *argv[])
 {
-    if (argc != 2)
-    {
-        std::cout << "server or client?";
-        return 1;
-    }
-
     QApplication a(argc, argv);
 
-    NetCoworkProvider* provider;
-    QHostAddress addr("localhost");
-    if (strcmp(argv[1], "server") == 0)
-    {
-        provider = new NetCoworkServer();
-    }
-    else
-    {
-        provider = new NetCoworkClient();
-    }
-    MainWindow w(provider);
+    MainWindow w;
     w.show();
 
     return a.exec();

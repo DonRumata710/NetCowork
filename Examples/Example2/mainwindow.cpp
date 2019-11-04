@@ -6,6 +6,16 @@
 #include <QMouseEvent>
 #include <QApplication>
 
+#include "game.h"
+
+
+enum Pages
+{
+    START_PAGE,
+    GAME_PAGE,
+    OPTIONS_PAGE
+};
+
 
 QMainWindow* getMainWindow()
 {
@@ -16,56 +26,40 @@ QMainWindow* getMainWindow()
 }
 
 
-
-template<>
-QPushButton* NetObjectProcessor<QPushButton>::generate_object() const
-{
-    return getMainWindow()->findChild<QPushButton*>("pushButton");
-}
-
-
-MainWindow::MainWindow(NetCoworkProvider* _provider, QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    provider(_provider),
-    nop(provider->register_new_class<NetObjectProcessor<QPushButton>>())
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-    if (provider->is_server())
-    {
-        obj = nop->get_object();
-    }
-
-    provider->set_add_object_callback([this](NetCoworker* p_obj, uint32_t class_id, uint32_t obj_id){
-        obj = dynamic_cast<decltype(obj)>(p_obj);
-    });
 }
 
 MainWindow::~MainWindow()
 {
-    delete nop;
     delete ui;
 }
 
-void MainWindow::mouseMoveEvent(QMouseEvent* event)
+void MainWindow::on_bStart_clicked()
 {
-    if (!obj)
-    {
-        return;
-    }
-
-    if (ui->pushButton->isChecked())
-    {
-        obj->move(event->pos());
-    }
-    QMainWindow::mouseMoveEvent(event);
+    qobject_cast<Game*>(ui->stackedWidget->widget(GAME_PAGE))->start(ui->port->value(), ui->address->text());
+    ui->stackedWidget->setCurrentIndex(GAME_PAGE);
 }
 
-void MainWindow::on_bStart_clicked(bool checked)
+void MainWindow::on_bSettings_clicked()
 {
-    if (checked)
-        provider->start("127.0.0.1", 33333);
-    else
-        provider->stop();
+    ui->stackedWidget->setCurrentIndex(OPTIONS_PAGE);
+}
+
+void MainWindow::on_bExit_clicked()
+{
+    QApplication::exit();
+}
+
+void MainWindow::on_buttonBox_accepted()
+{
+    address.setAddress(ui->address->text());
+}
+
+void MainWindow::on_buttonBox_clicked(QAbstractButton *button)
+{
+    ui->stackedWidget->setCurrentIndex(START_PAGE);
 }
