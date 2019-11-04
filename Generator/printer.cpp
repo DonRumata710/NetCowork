@@ -88,7 +88,7 @@ bool Printer::print_class(const Class& c)
 
     print_line("");
 
-    start_class(sync_class, "NetCoworker");
+    start_class(sync_class, "NetCoworker", c.get_name());
 
     print_line(sync_class + "(const " + processor_class + "<" + c.get_name() + ">* _proc, uint32_t object_id, " + c.get_name() + "* obj);");
     print_line("");
@@ -241,7 +241,7 @@ bool Printer::print_class(const Class& c)
     finish_class();
 
 
-    start_class(c.get_name() + "Processor", "NetCoworkFactory");
+    start_class(c.get_name() + "Processor", "NetCoworkFactory", c.get_name());
 
     print_line("typedef " + sync_class + "<" + c.get_name() + "> SyncObj;");
     print_line("");
@@ -318,7 +318,7 @@ bool Printer::print_class(const Class& c)
     print_line("SyncObj* sync_obj = dynamic_cast<SyncObj*>(obj);");
     print_line("if (!sync_obj)");
     increase_offset();
-    print_line("std::logic_error(\"Wrong object type in NetObjectProcessor\");");
+    print_line("std::logic_error(\"Wrong object type in " + processor_class + "\");");
     decrease_offset();
 
     for (const Property& property : c.get_properties())
@@ -420,11 +420,11 @@ std::string Printer::get_type_name(const CodeElement* element)
     }
 }
 
-void Printer::start_class(const std::string& name, const std::string& parent, const std::string& parent2)
+void Printer::start_class(const std::string& name, const std::string& parent, const std::string& template_type)
 {
     print_line("");
-    print_line("template<class NetObject>");
-    print_line("class " + name + (parent.empty() ? "" : (" : public " + parent + (parent2.empty() ? "" : (", public " + parent2)))));
+    print_line("template<class " + template_type + ">");
+    print_line("class " + name + (parent.empty() ? "" : (" : public " + parent)));
     print_line("{");
     print_line("public:");
     increase_offset();

@@ -26,7 +26,7 @@ private:
 
     std::string get_type_name(const CodeElement* element);
 
-    void start_class(const std::string& name, const std::string& parent = std::string(), const std::string& parent2 = std::string());
+    void start_class(const std::string& name, const std::string& parent = std::string(), const std::string& template_type = std::string());
     void print_function(const CodeElement* ret_type, const std::string& func_name,
                         const std::vector<Parameter>& parameters, bool is_const, const std::string& class_name = std::string());
     void print_function(const std::string& ret_type, const std::string& func_name,
