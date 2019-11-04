@@ -91,10 +91,16 @@ void NetCoworkProvider::process_func(uint32_t class_id, uint32_t object_id, Mess
             }
         }
 
+        if (!creation_filter(class_id))
+        {
+            return;
+        }
+
         NetCoworker* coworker = factories[class_id]->create_object(object_id);
         coworkers.push_back(coworker);
         if (msg.get_value<uint32_t>() == 0)
             factories[class_id]->sync(coworker, msg);
-        callback(coworker, class_id, object_id);
+        if (callback)
+            callback(coworker, class_id, object_id);
     }
 }

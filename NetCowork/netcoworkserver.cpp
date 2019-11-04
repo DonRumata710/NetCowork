@@ -7,6 +7,16 @@
 #include <QDebug>
 
 
+ClassFilter::ClassFilter(std::set<uint32_t> _private_classes) :
+    private_classes(_private_classes)
+{}
+
+bool ClassFilter::allow(QTcpSocket* socket, uint32_t class_id)
+{
+    return private_classes.find(class_id) == private_classes.end();
+}
+
+
 NetCoworkServer::NetCoworkServer()
 {
     connect(this, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
@@ -21,6 +31,24 @@ void NetCoworkServer::start(const std::string& address, uint16_t port)
 void NetCoworkServer::stop()
 {
     close();
+}
+
+void NetCoworkServer::set_creation_policy(NetCoworkServer::CreationPolicy new_policy)
+{
+    policy = new_policy;
+}
+
+bool NetCoworkServer::set_filter(std::unique_ptr<CreationFilter> new_filter)
+{
+    if (policy == CreationPolicy::CUSTOM)
+    {
+        filter.swap(new_filter);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 void NetCoworkServer::onNewConnection()
@@ -82,6 +110,19 @@ void NetCoworkServer::send_data(Message& msg)
 bool NetCoworkServer::is_server()
 {
     return true;
+}
+
+bool NetCoworkServer::creation_filter(uint32_t class_id)
+{
+    switch(policy)
+    {
+    case CreationPolicy::ALL:
+        return true;
+    case CreationPolicy::SERVER_ONLY:
+        return false;
+    case CreationPolicy::CUSTOM:
+        return filter->allow(qobject_cast<QTcpSocket*>(sender()), class_id);
+    }
 }
 
 void NetCoworkServer::send_data(const QByteArray& data)
