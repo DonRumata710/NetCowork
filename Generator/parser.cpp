@@ -103,6 +103,8 @@ bool Parser::parse_dependency()
     case TOKEN_ENUM:
         type = Type_enum::ENUM;
         break;
+    default:
+        std::cout << "unexpected import type";
     }
 
     std::string file_name = handler->next_word();
@@ -118,16 +120,17 @@ bool Parser::parse_dependency()
     if (it_token->second == TOKEN_DOT)
     {
         type_name = handler->next_word();
+
+        it_token = Token_from_str.find(handler->next_word());
+        if (it_token == Token_from_str.end() || it_token->second != TOKEN_SEMICOLON)
+        {
+            std::cout << "unexpected symbol after import '" << type_name << "', ';' expected";
+            return false;
+        }
     }
     else if (it_token->second != TOKEN_SEMICOLON)
     {
         std::cout << "unexpected symbol after import '" << type_name << "', ';' or '.' expected";
-    }
-
-    it_token = Token_from_str.find(handler->next_word());
-    if (it_token == Token_from_str.end() || it_token->second != TOKEN_SEMICOLON)
-    {
-        std::cout << "unexpected symbol after import '" << type_name << "', ';' expected";
         return false;
     }
 
