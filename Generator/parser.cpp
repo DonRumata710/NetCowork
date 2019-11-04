@@ -341,9 +341,22 @@ bool Parser::parse_enum(Enum* current_enum)
 bool Parser::parse_property(Property& property)
 {
     auto it_token = Token_from_str.find(handler->next_word());
+    if (it_token == Token_from_str.end())
+    {
+        std::cout << "unknown symbol in declaration of property '" << property.parameter.value_name << "'";
+        return false;
+    }
+
+    if (it_token->second == TOKEN_SEMICOLON)
+    {
+        property.setter = "set_" + property.parameter.value_name;
+        property.getter = "get_" + property.parameter.value_name;
+        return true;
+    }
+
     if (it_token->second != TOKEN_OPENING_BRACE)
     {
-        std::cout << "wrong syntax in declaration of property '" << property.parameter.value_name << "'";
+        std::cout << "unexpected symbol in declaration of property '" << property.parameter.value_name << "'";
         return false;
     }
 
