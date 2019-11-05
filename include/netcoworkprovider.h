@@ -13,7 +13,7 @@ class NetCoworkFactory;
 class NetCoworkProvider
 {
 public:
-    ~NetCoworkProvider() = default;
+    virtual ~NetCoworkProvider() = default;
 
     virtual void start(const std::string& address, uint16_t port) = 0;
     virtual void stop() = 0;
