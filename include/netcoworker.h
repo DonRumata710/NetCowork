@@ -15,11 +15,10 @@ class NetCoworker : public QObject
     Q_OBJECT
 
 public:
-    NetCoworker(const NetCoworkFactory* _factory, uint32_t object_id);
+    explicit NetCoworker(const NetCoworkFactory* _factory, uint32_t object_id = UINT32_MAX);
 
     virtual void handle_call(Message& msg) = 0;
 
-    [[deprecated]]
     uint32_t get_class_id() const;
 
     uint32_t get_object_id() const;
@@ -28,6 +27,11 @@ public:
 
 protected:
     void send_func_call(Message& msg) const;
+
+private:
+    friend class NetCoworkProvider;
+
+    void set_object_id(uint32_t new_object_id);
 
 private:
     const NetCoworkFactory* factory;

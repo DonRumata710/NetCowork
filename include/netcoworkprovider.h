@@ -2,12 +2,12 @@
 #define NETCOWORKPROVIDER_H
 
 #include "message.h"
+#include "netcoworkfactory.h"
 
 #include <functional>
 
 
 class NetCoworker;
-class NetCoworkFactory;
 
 
 class NetCoworkProvider
@@ -20,22 +20,26 @@ public:
 
     void send_func_call(Message& data);
 
-    void add_object(NetCoworker* object);
+    void add_local_object(NetCoworker* object);
 
     template<class Factory>
     Factory* register_new_class()
     {
         Factory* factory = new Factory(this);
-        add_new_factory(factory);
+        add_new_factory(std::unique_ptr<NetCoworkFactory>(factory));
         return factory;
     }
 
     virtual bool is_server() = 0;
 
     void set_add_object_callback(std::function<void (NetCoworker*, uint32_t, uint32_t)> func);
+    void set_add_class_callback(std::function<void (NetCoworkFactory*, uint32_t)> func);
 
 protected:
-    virtual void send_data(Message& data) = 0;
+    virtual void send_data(Message& msg) = 0;
+    virtual void send_data(Message&& msg) = 0;
+    virtual void respond(Message& msg) = 0;
+    virtual void respond(Message&& msg) = 0;
     void parse_message(const QByteArray& message);
 
     const NetCoworkFactory* get_factory(uint32_t i);
@@ -45,18 +49,21 @@ protected:
     uint32_t object_count();
 
 private:
-    void add_new_factory(NetCoworkFactory* factory);
+    void add_new_factory(std::unique_ptr<NetCoworkFactory> factory);
 
     void process_func(uint32_t class_id, uint32_t object_id, Message& data);
 
-    virtual bool creation_filter(uint32_t class_id) { return true; }
+    virtual bool creation_filter(uint32_t class_id);
 
 private:
     std::vector<NetCoworker*> coworkers;
-    std::vector<NetCoworkFactory*> factories;
+    std::vector<std::unique_ptr<NetCoworkFactory>> factories;
     std::map<std::string, uint32_t> class_ids;
 
-    std::function<void (NetCoworker*, uint32_t, uint32_t)> callback;
+    std::function<void (NetCoworker*, uint32_t, uint32_t)> obj_callback;
+    std::function<void (NetCoworkFactory*, uint32_t)> class_callback;
+
+    std::vector<NetCoworker*> requests;
 };
 
 

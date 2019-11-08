@@ -1,6 +1,5 @@
 #include "netcoworkprovider.h"
 
-#include "netcoworkfactory.h"
 #include "netcoworker.h"
 
 
@@ -9,27 +8,40 @@ void NetCoworkProvider::send_func_call(Message& msg)
     send_data(msg);
 }
 
-void NetCoworkProvider::add_object(NetCoworker *object)
+void NetCoworkProvider::add_local_object(NetCoworker* object)
 {
-    coworkers.push_back(object);
+    if (is_server())
+    {
+        object->set_object_id(coworkers.size());
+        coworkers.push_back(object);
+    }
+    else
+    {
+        requests.push_back(object);
+    }
+
+    send_data(object->get_factory()->get_sync_message(object));
 }
 
 void NetCoworkProvider::set_add_object_callback(std::function<void(NetCoworker*, uint32_t, uint32_t)> func)
 {
-    callback = func;
+    obj_callback = func;
+}
+
+void NetCoworkProvider::set_add_class_callback(std::function<void(NetCoworkFactory*, uint32_t)> func)
+{
+    class_callback = func;
 }
 
 void NetCoworkProvider::parse_message(const QByteArray& message)
 {
-    uint32_t class_id = *(reinterpret_cast<uint32_t*>(message.mid(0, 4).data()));
-    uint32_t object_id = *(reinterpret_cast<uint32_t*>(message.mid(4, 4).data()));
-    Message msg(message.mid(8));
-    process_func(class_id, object_id, msg);
+    Message msg(message);
+    process_func(msg.get_class_id(), msg.get_object_id(), msg);
 }
 
 const NetCoworkFactory* NetCoworkProvider::get_factory(uint32_t i)
 {
-    return factories[i];
+    return factories[i].get();
 }
 
 uint32_t NetCoworkProvider::factory_count() const
@@ -47,10 +59,9 @@ uint32_t NetCoworkProvider::object_count()
     return static_cast<uint32_t>(coworkers.size());
 }
 
-void NetCoworkProvider::add_new_factory(NetCoworkFactory* factory)
+void NetCoworkProvider::add_new_factory(std::unique_ptr<NetCoworkFactory> factory)
 {
-    factories.push_back(factory);
-    uint32_t new_class_local_id = static_cast<uint32_t>(factories.size() - 1);
+    uint32_t new_class_local_id = static_cast<uint32_t>(factories.size());
 
     if (is_server())
     {
@@ -62,6 +73,8 @@ void NetCoworkProvider::add_new_factory(NetCoworkFactory* factory)
         msg.set_metadata(UINT32_MAX, new_class_local_id);
         send_data(msg);
     }
+
+    factories.push_back(std::move(factory));
 }
 
 void NetCoworkProvider::process_func(uint32_t class_id, uint32_t object_id, Message& msg)
@@ -74,10 +87,14 @@ void NetCoworkProvider::process_func(uint32_t class_id, uint32_t object_id, Mess
             throw std::logic_error("There is no such class on this client");
         class_ids.insert(decltype(class_ids)::value_type(name, object_id));
 
-        for (auto factory : factories)
+        for (const auto& factory : factories)
         {
             if (factory->get_name() == name)
+            {
                 factory->set_class_id(object_id);
+                if (class_callback)
+                    class_callback(factory.get(), object_id);
+            }
         }
     }
     else
@@ -86,7 +103,10 @@ void NetCoworkProvider::process_func(uint32_t class_id, uint32_t object_id, Mess
         {
             if (object->get_class_id() == class_id && object->get_object_id() == object_id)
             {
-                object->handle_call(msg);
+                if (msg.get_func_id() == 0)
+                    factories[class_id]->sync(object, msg);
+                else
+                    object->handle_call(msg);
                 return;
             }
         }
@@ -96,11 +116,44 @@ void NetCoworkProvider::process_func(uint32_t class_id, uint32_t object_id, Mess
             return;
         }
 
-        NetCoworker* coworker = factories[class_id]->create_object(object_id);
+        if (is_server())
+        {
+            object_id = coworkers.size();
+            msg.set_object_id(object_id);
+            send_data(msg);
+
+            Message responce;
+            responce.set_metadata(msg.get_class_id(), msg.get_object_id(), 0);
+            respond(responce);
+        }
+        else if (msg.get_size() != 0)
+        {
+            for (NetCoworker* obj : requests)
+            {
+                if (obj->get_class_id() == class_id)
+                {
+                    obj->set_object_id(object_id);
+                    return;
+                }
+            }
+        }
+
+        if (object_id == UINT32_MAX)
+            return;
+
+        NetCoworker* coworker = factories[class_id]->create_object();
+        coworker->set_object_id(object_id);
         coworkers.push_back(coworker);
-        if (msg.get_value<uint32_t>() == 0)
+        if (msg.get_func_id() == 0)
+        {
             factories[class_id]->sync(coworker, msg);
-        if (callback)
-            callback(coworker, class_id, object_id);
+            if (obj_callback)
+                obj_callback(coworker, class_id, object_id);
+        }
     }
+}
+
+bool NetCoworkProvider::creation_filter(uint32_t class_id)
+{
+    return true;
 }

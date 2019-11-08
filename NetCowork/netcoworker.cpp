@@ -28,3 +28,8 @@ void NetCoworker::send_func_call(Message& msg) const
     msg.set_object_id(object_id);
     factory->send_func_call(msg);
 }
+
+void NetCoworker::set_object_id(uint32_t new_object_id)
+{
+    object_id = new_object_id;
+}

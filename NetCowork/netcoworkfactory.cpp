@@ -28,5 +28,5 @@ uint32_t NetCoworkFactory::get_class_id() const
 
 void NetCoworkFactory::add_object(NetCoworker* obj)
 {
-    provider->add_object(obj);
+    provider->add_local_object(obj);
 }

@@ -24,6 +24,9 @@ public slots:
 
 protected:
     virtual void send_data(Message& data) override;
+    virtual void send_data(Message&& msg) override;
+    virtual void respond(Message& msg) override;
+    virtual void respond(Message&& msg) override;
     virtual bool is_server() override;
 
 private:

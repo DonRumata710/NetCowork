@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 {
     if (argc != 2)
     {
-        std::cout << "server or client?";
+        std::cout << "server or client?\n";
         return 1;
     }
 

@@ -26,6 +26,23 @@ void NetCoworkClient::send_data(Message& msg)
     socket.write(msg.get_data());
 }
 
+void NetCoworkClient::send_data(Message&& msg)
+{
+    socket.write(msg.get_data());
+}
+
+void NetCoworkClient::respond(Message& msg)
+{
+    Q_UNUSED(msg)
+    throw std::logic_error("Unexpected method call in client");
+}
+
+void NetCoworkClient::respond(Message&& msg)
+{
+    Q_UNUSED(msg)
+    throw std::logic_error("Unexpected method call in client");
+}
+
 bool NetCoworkClient::is_server()
 {
     return false;

@@ -90,7 +90,7 @@ bool Printer::print_class(const Class& c)
 
     start_class(sync_class, "NetCoworker", c.get_name());
 
-    print_line(sync_class + "(const " + processor_class + "<" + c.get_name() + ">* _proc, uint32_t object_id, " + c.get_name() + "* obj);");
+    print_line(sync_class + "(const " + processor_class + "<" + c.get_name() + ">* _proc, " + c.get_name() + "* obj);");
     print_line("");
 
     size_t counter = 1;
@@ -152,8 +152,7 @@ bool Printer::print_class(const Class& c)
     print_line("void handle_call(Message& data)");
     print_line("{");
     increase_offset();
-    print_line("uint32_t func_id = data.get_value<uint32_t>();");
-    print_line("switch (func_id)");
+    print_line("switch (data->get_func_id())");
     print_line("{");
     print_line("case 0:");
     increase_offset();
@@ -256,11 +255,10 @@ bool Printer::print_class(const Class& c)
     print_line("SyncObj* get_object()");
     print_line("{");
     increase_offset();
-    print_line("uint32_t cnt = get_counter()++;");
     print_line("Message m;");
     print_line("m.add_value(cnt);");
     print_line("send_func_call(m);");
-    print_line("auto* obj = new " + c.get_name() + "Sync(this, cnt, generate_object());");
+    print_line("auto* obj = new SyncObj(this, generate_object());");
     print_line("add_object(obj);");
     print_line("return obj;");
     decrease_offset();
@@ -278,9 +276,7 @@ bool Printer::print_class(const Class& c)
     print_line("NetCoworker* create_object(uint32_t object_id) const");
     print_line("{");
     increase_offset();
-    print_line("get_counter() = object_id + 1;");
-    print_line("auto* obj = new " + sync_class + "(this, object_id, generate_object());");
-    print_line("return obj;");
+    print_line("return new SyncObj(this, generate_object());");
     decrease_offset();
     print_line("}");
     print_line("");
@@ -300,8 +296,7 @@ bool Printer::print_class(const Class& c)
     print_line("return Message();");
     decrease_offset();
     print_line("Message msg;");
-    print_line("msg.set_metadata(get_class_id(), obj->get_object_id());");
-    print_line("msg.add_value<uint32_t>(0);");
+    print_line("msg.set_metadata(get_class_id(), obj->get_object_id(), 0);");
 
     for (const Property& property : c.get_properties())
     {
@@ -337,14 +332,6 @@ bool Printer::print_class(const Class& c)
     decrease_offset();
     print_line("}");
     print_line("");
-
-    print_line("static uint32_t& get_counter()");
-    print_line("{");
-    increase_offset();
-    print_line("static uint32_t counter = 0;");
-    print_line("return counter;");
-    decrease_offset();
-    print_line("}");
 
     finish_class();
 

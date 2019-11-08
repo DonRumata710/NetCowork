@@ -57,11 +57,15 @@ public slots:
 
 protected:
     virtual void send_data(Message& data) override;
+    virtual void send_data(Message&& msg) override;
+    virtual void respond(Message& msg) override;
+    virtual void respond(Message&& msg) override;
     virtual bool is_server() override;
     virtual bool creation_filter(uint32_t class_id) override;
 
 private:
     void send_data(const QByteArray& data);
+    void respond(const QByteArray& data);
 
 private:
     std::vector<QTcpSocket*> sockets;

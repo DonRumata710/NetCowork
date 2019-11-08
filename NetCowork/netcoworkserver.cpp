@@ -107,6 +107,21 @@ void NetCoworkServer::send_data(Message& msg)
     send_data(msg.get_data());
 }
 
+void NetCoworkServer::send_data(Message&& msg)
+{
+    send_data(msg.get_data());
+}
+
+void NetCoworkServer::respond(Message& msg)
+{
+    respond(msg.get_data());
+}
+
+void NetCoworkServer::respond(Message&& msg)
+{
+    respond(msg.get_data());
+}
+
 bool NetCoworkServer::is_server()
 {
     return true;
@@ -130,10 +145,15 @@ void NetCoworkServer::send_data(const QByteArray& data)
     for (auto socket : sockets)
     {
         if (socket != sender())
-        {
             socket->write(data);
-        }
     }
 
     qDebug() << "Data is sended";
+}
+
+void NetCoworkServer::respond(const QByteArray& data)
+{
+    QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
+    if (socket)
+        socket->write(data);
 }
