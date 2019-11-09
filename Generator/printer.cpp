@@ -152,7 +152,7 @@ bool Printer::print_class(const Class& c)
     print_line("void handle_call(Message& data)");
     print_line("{");
     increase_offset();
-    print_line("switch (data->get_func_id())");
+    print_line("switch (data.get_func_id())");
     print_line("{");
     print_line("case 0:");
     increase_offset();
@@ -255,9 +255,6 @@ bool Printer::print_class(const Class& c)
     print_line("SyncObj* get_object()");
     print_line("{");
     increase_offset();
-    print_line("Message m;");
-    print_line("m.add_value(cnt);");
-    print_line("send_func_call(m);");
     print_line("auto* obj = new SyncObj(this, generate_object());");
     print_line("add_object(obj);");
     print_line("return obj;");
@@ -273,7 +270,7 @@ bool Printer::print_class(const Class& c)
     print_line(c.get_name() + "* generate_object() const;");
     print_line("");
 
-    print_line("NetCoworker* create_object(uint32_t object_id) const");
+    print_line("NetCoworker* create_object() const");
     print_line("{");
     increase_offset();
     print_line("return new SyncObj(this, generate_object());");
@@ -338,9 +335,9 @@ bool Printer::print_class(const Class& c)
 
     print_line("");
     print_line("template<class " + c.get_name() + ">");
-    print_line(sync_function + sync_class + "(const " + processor_class + "<" + c.get_name() + ">* _proc, uint32_t object_id, " + c.get_name() + "* obj) :");
+    print_line(sync_function + sync_class + "(const " + processor_class + "<" + c.get_name() + ">* _proc, " + c.get_name() + "* obj) :");
     increase_offset();
-    print_line("NetCoworker(_proc, object_id),");
+    print_line("NetCoworker(_proc),");
     print_line("impl(obj)");
     decrease_offset();
     print_line("{}");
