@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QHostAddress>
+#include <QPaintEvent>
 
 #include "generated/Ball_net.h"
 #include "generated/Platform_net.h"
@@ -15,8 +16,10 @@
 class Game : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit Game(QWidget *parent = nullptr);
+    ~Game();
 
 signals:
 
@@ -26,6 +29,10 @@ public slots:
 private:
     void create_server(uint16_t port);
     void create_client(const QString& addr, uint16_t port);
+
+    virtual void paintEvent(QPaintEvent *event) override;
+
+    void drawPlatform(int16_t pos, QPainter& painter, int step, bool on_top);
 
 private:
     std::unique_ptr<NetCoworkProvider> provider;

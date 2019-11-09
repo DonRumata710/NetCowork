@@ -20,6 +20,7 @@ public:
     Message(Message&& msg) :
         class_id(msg.class_id),
         object_id(msg.object_id),
+        func_id(msg.func_id),
         data(std::move(msg.data)),
         stream(&data, QIODevice::ReadOnly)
     {}
@@ -87,7 +88,7 @@ public:
 
     uint32_t get_func_id()
     {
-        return object_id;
+        return func_id;
     }
 
     void set_func_id(uint32_t new_func_id)

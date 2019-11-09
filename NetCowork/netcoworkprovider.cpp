@@ -33,12 +33,6 @@ void NetCoworkProvider::set_add_class_callback(std::function<void(NetCoworkFacto
     class_callback = func;
 }
 
-void NetCoworkProvider::parse_message(const QByteArray& message)
-{
-    Message msg(message);
-    process_func(msg.get_class_id(), msg.get_object_id(), msg);
-}
-
 const NetCoworkFactory* NetCoworkProvider::get_factory(uint32_t i)
 {
     return factories[i].get();
@@ -77,78 +71,80 @@ void NetCoworkProvider::add_new_factory(std::unique_ptr<NetCoworkFactory> factor
     factories.push_back(std::move(factory));
 }
 
-void NetCoworkProvider::process_func(uint32_t class_id, uint32_t object_id, Message& msg)
+void NetCoworkProvider::process_func(Message& msg)
 {
-    if (class_id == UINT32_MAX)
+    if (msg.get_class_id() == UINT32_MAX)
     {
         std::string name = msg.get_string();
         auto it = class_ids.find(name);
         if (it != class_ids.end())
             throw std::logic_error("There is no such class on this client");
-        class_ids.insert(decltype(class_ids)::value_type(name, object_id));
+        class_ids.insert(decltype(class_ids)::value_type(name, msg.get_object_id()));
 
         for (const auto& factory : factories)
         {
             if (factory->get_name() == name)
             {
-                factory->set_class_id(object_id);
+                factory->set_class_id(msg.get_object_id());
                 if (class_callback)
-                    class_callback(factory.get(), object_id);
+                    class_callback(factory.get(), msg.get_object_id());
             }
         }
     }
     else
     {
-        for (auto object : coworkers)
+        if (msg.get_object_id() == UINT32_MAX)
         {
-            if (object->get_class_id() == class_id && object->get_object_id() == object_id)
+            for (auto object : coworkers)
             {
-                if (msg.get_func_id() == 0)
-                    factories[class_id]->sync(object, msg);
-                else
-                    object->handle_call(msg);
-                return;
+                if (object->get_class_id() == msg.get_class_id() && object->get_object_id() == msg.get_object_id())
+                {
+                    if (msg.get_func_id() == 0)
+                        factories[msg.get_class_id()]->sync(object, msg);
+                    else
+                        object->handle_call(msg);
+                    return;
+                }
             }
         }
 
-        if (!creation_filter(class_id))
+        if (!creation_filter(msg.get_class_id()))
         {
             return;
         }
 
         if (is_server())
         {
-            object_id = coworkers.size();
-            msg.set_object_id(object_id);
-            send_data(msg);
+            msg.set_object_id(coworkers.size());
+            //send_data(msg);
 
             Message responce;
             responce.set_metadata(msg.get_class_id(), msg.get_object_id(), 0);
             respond(responce);
         }
-        else if (msg.get_size() != 0)
+        else if (msg.get_size() == 0)
         {
             for (NetCoworker* obj : requests)
             {
-                if (obj->get_class_id() == class_id)
+                if (obj->get_class_id() == msg.get_class_id())
                 {
-                    obj->set_object_id(object_id);
+                    obj->set_object_id(msg.get_object_id());
                     return;
                 }
             }
         }
 
-        if (object_id == UINT32_MAX)
+        if (msg.get_object_id() == UINT32_MAX)
             return;
 
-        NetCoworker* coworker = factories[class_id]->create_object();
-        coworker->set_object_id(object_id);
+        NetCoworker* coworker = factories[msg.get_class_id()]->create_object();
+        coworker->set_object_id(msg.get_object_id());
         coworkers.push_back(coworker);
         if (msg.get_func_id() == 0)
         {
-            factories[class_id]->sync(coworker, msg);
+            factories[msg.get_class_id()]->sync(coworker, msg);
             if (obj_callback)
-                obj_callback(coworker, class_id, object_id);
+                obj_callback(coworker, msg.get_class_id(), msg.get_object_id());
         }
     }
 }

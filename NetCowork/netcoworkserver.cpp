@@ -97,7 +97,8 @@ void NetCoworkServer::onDataReady()
     QByteArray data(block_size, 0);
     in.readRawData(data.data(), block_size);
 
-    parse_message(data);
+    Message msg(data);
+    process_func(msg);
 
     send_data(data);
 }

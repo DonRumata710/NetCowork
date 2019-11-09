@@ -79,5 +79,7 @@ void NetCoworkClient::onDataReady()
     socket->read(data.data(), expeted_data);
     expeted_data = 0;
 
-    parse_message(data);
+    Message msg(data);
+    qDebug() << "Message data:" << msg.get_class_id() << msg.get_object_id() << msg.get_func_id();
+    process_func(msg);
 }

@@ -36,9 +36,14 @@ private slots:
     void on_buttonBox_clicked(QAbstractButton *button);
 
 private:
+    virtual bool hasHeightForWidth() const override;
+    virtual int heightForWidth(int w) const override;
+
+private:
     Ui::MainWindow *ui;
 
-    QHostAddress address;
+    QString address = "localhost";
+    uint16_t port = 1024;
 };
 
 #endif // MAINWINDOW_H

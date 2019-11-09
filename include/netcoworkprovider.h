@@ -40,7 +40,7 @@ protected:
     virtual void send_data(Message&& msg) = 0;
     virtual void respond(Message& msg) = 0;
     virtual void respond(Message&& msg) = 0;
-    void parse_message(const QByteArray& message);
+    void process_func(Message& data);
 
     const NetCoworkFactory* get_factory(uint32_t i);
     uint32_t factory_count() const;
@@ -51,7 +51,6 @@ protected:
 private:
     void add_new_factory(std::unique_ptr<NetCoworkFactory> factory);
 
-    void process_func(uint32_t class_id, uint32_t object_id, Message& data);
 
     virtual bool creation_filter(uint32_t class_id);
 

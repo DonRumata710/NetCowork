@@ -46,12 +46,12 @@ INCLUDEPATH += \
 FORMS += \
         mainwindow.ui
 
-netcowork.target = generated/netobject_net.h
+netcowork.target = generated/Ball_net.h generated/Platform_net.h
 netcowork.depends = $$PWD/netobjects.nc
 CONFIG(release, debug|release): netcowork.commands = $$OUT_PWD/../../Generator/release/Generator -i $$PWD/netobjects.nc -o generated
 CONFIG(debug, debug|release): netcowork.commands = $$OUT_PWD/../../Generator/debug/Generator -i $$PWD/netobjects.nc -o generated
 QMAKE_EXTRA_TARGETS += netcowork
-PRE_TARGETDEPS += generated/netobject_net.h
+PRE_TARGETDEPS += generated/Ball_net.h generated/Platform_net.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
