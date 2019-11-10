@@ -6,5 +6,5 @@ SUBDIRS = \
     Examples \
     Tests
 
-Examples.depends = NetCowork
+Examples.depends = NetCowork Generator
 Tests.depends = NetCowork
