@@ -30,7 +30,8 @@ SOURCES += \
         netcoworker.cpp \
         netcoworkfactory.cpp \
         netcoworkprovider.cpp \
-        netcoworkserver.cpp
+        netcoworkserver.cpp \
+        message.cpp
 
 HEADERS += \
         $$PWD/../include/message.h \
