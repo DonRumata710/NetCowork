@@ -78,29 +78,10 @@ void NetCoworkServer::onDataReady()
     qDebug() << "Data coming";
 
     QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
-    QDataStream in(socket);
-    in.setVersion(QDataStream::Qt_4_2);
-    quint16 block_size = 0;
-    while(true)
-    {
-        if (!block_size)
-        {
-            if (socket->bytesAvailable() < sizeof(quint16))
-                break;
-            in >> block_size;
-        }
-
-        if (socket->bytesAvailable() < block_size)
-            break;
-    }
-
-    QByteArray data(block_size, 0);
-    in.readRawData(data.data(), block_size);
-
-    Message msg(data);
+    Message msg(Message::get_message(socket));
     process_func(msg);
 
-    send_data(data);
+    send_data(msg);
 }
 
 void NetCoworkServer::send_data(Message& msg)
@@ -146,7 +127,11 @@ void NetCoworkServer::send_data(const QByteArray& data)
     for (auto socket : sockets)
     {
         if (socket != sender())
-            socket->write(data);
+        {
+            if (socket->write(data) != data.size())
+                qCritical() << "Failure sending data";
+            socket->flush();
+        }
     }
 
     qDebug() << "Data is sended";
@@ -156,5 +141,9 @@ void NetCoworkServer::respond(const QByteArray& data)
 {
     QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
     if (socket)
-        socket->write(data);
+    {
+        if (socket->write(data) != data.size())
+            qCritical() << "Failure sending data";
+        socket->flush();
+    }
 }

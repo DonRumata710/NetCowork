@@ -10,6 +10,8 @@ Message::Message(const QByteArray& _data) :
     data(_data),
     stream(&data, QIODevice::ReadWrite)
 {
+    stream.setVersion(QDataStream::Qt_4_2);
+
     stream >> class_id;
     stream >> object_id;
     stream >> func_id;
@@ -22,6 +24,8 @@ Message::Message(QByteArray&& _data) :
     data(std::move(_data)),
     stream(&data, QIODevice::ReadWrite)
 {
+    stream.setVersion(QDataStream::Qt_4_2);
+
     stream >> class_id;
     stream >> object_id;
     stream >> func_id;
@@ -36,7 +40,9 @@ Message::Message(Message&& msg) :
     func_id(msg.func_id),
     data(std::move(msg.data)),
     stream(&data, QIODevice::ReadWrite)
-{}
+{
+    stream.setVersion(QDataStream::Qt_4_2);
+}
 
 Message Message::get_message(QIODevice* device)
 {

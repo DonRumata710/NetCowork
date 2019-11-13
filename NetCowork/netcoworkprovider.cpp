@@ -3,8 +3,13 @@
 #include "netcoworker.h"
 
 
-void NetCoworkProvider::send_func_call(Message& msg)
+void NetCoworkProvider::send_func_call(Message& msg, const NetCoworker* obj)
 {
+    if (obj->get_class_id() == UINT32_MAX || obj->get_object_id() == UINT32_MAX)
+    {
+        messages.push_back({ std::move(msg), obj });
+        return;
+    }
     send_data(msg);
 }
 
@@ -93,7 +98,7 @@ void NetCoworkProvider::process_func(Message& msg)
     }
     else
     {
-        if (msg.get_object_id() == UINT32_MAX)
+        if (msg.get_object_id() != UINT32_MAX)
         {
             for (auto object : coworkers)
             {
@@ -116,7 +121,6 @@ void NetCoworkProvider::process_func(Message& msg)
         if (is_server())
         {
             msg.set_object_id(coworkers.size());
-            //send_data(msg);
 
             Message responce;
             responce.set_metadata(msg.get_class_id(), msg.get_object_id(), 0);
@@ -129,6 +133,11 @@ void NetCoworkProvider::process_func(Message& msg)
                 if (obj->get_class_id() == msg.get_class_id())
                 {
                     obj->set_object_id(msg.get_object_id());
+                    for (auto& deffered_msg : messages)
+                    {
+                        if (deffered_msg.second->get_object_id() == msg.get_object_id() && deffered_msg.second->get_class_id() == msg.get_class_id())
+                            send_data(deffered_msg.first);
+                    }
                     return;
                 }
             }

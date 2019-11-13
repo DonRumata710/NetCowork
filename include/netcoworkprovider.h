@@ -18,7 +18,7 @@ public:
     virtual void start(const std::string& address, uint16_t port) = 0;
     virtual void stop() = 0;
 
-    void send_func_call(Message& data);
+    void send_func_call(Message& data, const NetCoworker* obj);
 
     void add_local_object(NetCoworker* object);
 
@@ -51,7 +51,6 @@ protected:
 private:
     void add_new_factory(std::unique_ptr<NetCoworkFactory> factory);
 
-
     virtual bool creation_filter(uint32_t class_id);
 
 private:
@@ -63,6 +62,7 @@ private:
     std::function<void (NetCoworkFactory*, uint32_t)> class_callback;
 
     std::vector<NetCoworker*> requests;
+    std::vector<std::pair<Message, const NetCoworker*>> messages;
 };
 
 

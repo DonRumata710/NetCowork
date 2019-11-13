@@ -14,7 +14,7 @@ public:
 
     uint32_t get_class_id() const;
 
-    void send_func_call(Message& msg) const;
+    void send_func_call(Message& msg, const NetCoworker* coworker) const;
 
 protected:
     NetCoworkFactory(NetCoworkProvider* provider);

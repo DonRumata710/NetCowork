@@ -24,11 +24,13 @@ void NetCoworkClient::stop()
 void NetCoworkClient::send_data(Message& msg)
 {
     socket.write(msg.get_data());
+    socket.flush();
 }
 
 void NetCoworkClient::send_data(Message&& msg)
 {
     socket.write(msg.get_data());
+    socket.flush();
 }
 
 void NetCoworkClient::respond(Message& msg)
@@ -60,26 +62,7 @@ void NetCoworkClient::onDataReady()
     qDebug() << "Data coming";
 
     QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
-    if (!expeted_data)
-    {
-        if (socket->bytesAvailable() >= sizeof(quint16))
-            socket->read(reinterpret_cast<char*>(&expeted_data), sizeof(expeted_data));
-    }
-
-    if (socket->bytesAvailable() < expeted_data)
-        return;
-
-    if (expeted_data == 0)
-    {
-        qDebug() << "Empty message";
-        return;
-    }
-
-    QByteArray data(expeted_data, 0);
-    socket->read(data.data(), expeted_data);
-    expeted_data = 0;
-
-    Message msg(data);
+    Message msg(Message::get_message(socket));
     qDebug() << "Message data:" << msg.get_class_id() << msg.get_object_id() << msg.get_func_id();
     process_func(msg);
 }
