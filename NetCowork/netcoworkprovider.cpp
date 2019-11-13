@@ -128,18 +128,23 @@ void NetCoworkProvider::process_func(Message& msg)
         }
         else if (msg.get_size() == 0)
         {
-            for (auto it = requests.begin(); it < requests.end(); ++it)
+            for (auto req_it = requests.begin(); req_it < requests.end(); ++req_it)
             {
-                auto& obj = *it;
+                auto& obj = *req_it;
                 if (obj->get_class_id() == msg.get_class_id())
                 {
                     obj->set_object_id(msg.get_object_id());
-                    for (auto& deffered_msg : messages)
+                    for (auto deffered_msg = messages.begin(); deffered_msg < messages.end(); ++deffered_msg)
                     {
-                        if (deffered_msg.second->get_object_id() == msg.get_object_id() && deffered_msg.second->get_class_id() == msg.get_class_id())
-                            send_data(deffered_msg.first);
+                        if (deffered_msg->second->get_object_id() == msg.get_object_id() && deffered_msg->second->get_class_id() == msg.get_class_id())
+                        {
+                            send_data(deffered_msg->first);
+                            deffered_msg = messages.erase(deffered_msg);
+                            if (deffered_msg != messages.begin())
+                                --deffered_msg;
+                        }
                     }
-                    requests.erase(it);
+                    requests.erase(req_it);
                     return;
                 }
             }

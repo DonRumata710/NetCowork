@@ -44,6 +44,18 @@ Message::Message(Message&& msg) :
     stream.setVersion(QDataStream::Qt_5_6);
 }
 
+Message& Message::operator=(Message&& msg)
+{
+    class_id = msg.class_id;
+    object_id = msg.object_id;
+    func_id = msg.func_id;
+    data = std::move(msg.data);
+    stream.setDevice(msg.stream.device());
+    stream.setVersion(QDataStream::Qt_5_6);
+
+    return *this;
+}
+
 Message Message::get_message(QIODevice* device)
 {
     QDataStream stream(device);

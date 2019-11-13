@@ -12,6 +12,8 @@ public:
     explicit Message(QByteArray&& _data);
     Message(Message&& msg);
 
+    Message& operator=(Message&& msg);
+
     static Message get_message(QIODevice* device);
 
     size_t get_size() const;
