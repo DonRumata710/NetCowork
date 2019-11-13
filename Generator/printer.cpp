@@ -111,7 +111,7 @@ bool Printer::print_class(const Class& c)
         print_line("impl->" + c.get_functions()[i].get_name() + "(" + args + ");");
 
         print_line("Message msg;");
-        print_line("msg.add_value(uint32_t(" + std::to_string(counter++) + "));");
+        print_line("msg.set_func_id(" + std::to_string(counter++) + ");");
 
         for (const auto& param : c.get_functions()[i].get_parameters())
             print_line("msg.add_value(" + param.value_name + ");");
@@ -133,7 +133,7 @@ bool Printer::print_class(const Class& c)
         increase_offset();
         print_line("impl->" + property.setter + "(" + parameter + ");");
         print_line("Message msg;");
-        print_line("msg.add_value(uint32_t(" + std::to_string(counter++) + "));");
+        print_line("msg.set_func_id(" + std::to_string(counter++) + ");");
         print_line("msg.add_value(" + parameter + ");");
         print_line("send_func_call(msg);");
         decrease_offset();
