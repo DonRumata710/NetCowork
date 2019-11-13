@@ -128,8 +128,9 @@ void NetCoworkProvider::process_func(Message& msg)
         }
         else if (msg.get_size() == 0)
         {
-            for (NetCoworker* obj : requests)
+            for (auto it = requests.begin(); it < requests.end(); ++it)
             {
+                auto& obj = *it;
                 if (obj->get_class_id() == msg.get_class_id())
                 {
                     obj->set_object_id(msg.get_object_id());
@@ -138,6 +139,7 @@ void NetCoworkProvider::process_func(Message& msg)
                         if (deffered_msg.second->get_object_id() == msg.get_object_id() && deffered_msg.second->get_class_id() == msg.get_class_id())
                             send_data(deffered_msg.first);
                     }
+                    requests.erase(it);
                     return;
                 }
             }
