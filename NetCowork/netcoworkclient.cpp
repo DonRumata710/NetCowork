@@ -65,4 +65,7 @@ void NetCoworkClient::onDataReady()
     Message msg(Message::get_message(socket));
     qDebug() << "Message data:" << msg.get_class_id() << msg.get_object_id() << msg.get_func_id();
     process_func(msg);
+
+    if (!socket->atEnd())
+        onDataReady();
 }
