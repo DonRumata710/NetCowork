@@ -51,7 +51,6 @@ netcowork.depends = $$PWD/netobjects.nc
 CONFIG(release, debug|release): netcowork.commands = $$OUT_PWD/../../Generator/release/Generator -i $$PWD/netobjects.nc -o $$OUT_PWD/generated
 CONFIG(debug, debug|release): netcowork.commands = $$OUT_PWD/../../Generator/debug/Generator -i $$PWD/netobjects.nc -o $$OUT_PWD/generated
 QMAKE_EXTRA_TARGETS += netcowork
-PRE_TARGETDEPS += $$netcowork.target
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
