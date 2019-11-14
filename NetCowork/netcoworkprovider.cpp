@@ -138,8 +138,13 @@ void NetCoworkProvider::process_func(Message& msg)
                     {
                         if (deffered_msg->second->get_object_id() == msg.get_object_id() && deffered_msg->second->get_class_id() == msg.get_class_id())
                         {
+                            deffered_msg->first.set_class_id(deffered_msg->second->get_class_id());
+                            deffered_msg->first.set_object_id(deffered_msg->second->get_object_id());
+
                             send_data(deffered_msg->first);
                             deffered_msg = messages.erase(deffered_msg);
+                            if (deffered_msg == messages.end())
+                                break;
                             if (deffered_msg != messages.begin())
                                 --deffered_msg;
                         }
