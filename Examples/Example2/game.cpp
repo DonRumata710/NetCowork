@@ -4,30 +4,63 @@
 #include "netcoworkclient.h"
 
 #include <QPainter>
+#include <QGraphicsScene>
+#include <QKeyEvent>
+
+
+Game* Game::instance(nullptr);
 
 
 template<>
 Ball* BallProcessor<Ball>::generate_object() const
 {
-    return new Ball;
+    Ball* ball = new Ball;
+    Game::get_instance()->add_item(ball);
+    ball->set_pos({ int(Game::get_instance()->sceneRect().width() / 2), int(Game::get_instance()->sceneRect().height() / 2) });
+    return ball;
 }
 
 
 template<>
 Platform* PlatformProcessor<Platform>::generate_object() const
 {
-    return new Platform;
+    Platform* platform = new Platform;
+    Game::get_instance()->add_item(platform);
+    platform->set_h_pos(480);
+    return platform;
 }
 
 
 Game::Game(QWidget* parent) :
-    QWidget(parent)
-{}
+    QGraphicsView(parent)
+{
+    if (instance)
+        throw std::logic_error("Several instances of Game");
+
+    instance = this;
+
+    setScene(new QGraphicsScene);  /// Устанавливаем графическую сцену в graphicsView
+    setRenderHint(QPainter::Antialiasing);    /// Устанавливаем сглаживание
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); /// Отключаем скроллбар по вертикали
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); /// Отключаем скроллбар по горизонтали
+
+    scene()->setSceneRect(0, 0, 500, 500);
+}
 
 Game::~Game()
 {
     if (provider)
         provider->stop();
+}
+
+void Game::add_item(QGraphicsItem* item)
+{
+    scene()->addItem(item);
+}
+
+Game* Game::get_instance()
+{
+    return instance;
 }
 
 void Game::start(uint16_t port, const QString& addr)
@@ -41,7 +74,8 @@ void Game::start(uint16_t port, const QString& addr)
         if (platform_processor == factory)
         {
             platform = platform_processor->get_object();
-            platform->set_pos(50);
+            platform->set_pos(sceneRect().width() / 2);
+            platform->get_impl()->set_h_pos(480);
         }
     });
 
@@ -53,6 +87,7 @@ void Game::start(uint16_t port, const QString& addr)
             if (bs)
             {
                 balls.push_back(bs);
+                bs->get_impl()->update();
             }
         }
         else if (class_id == platform_processor->get_class_id())
@@ -61,9 +96,32 @@ void Game::start(uint16_t port, const QString& addr)
             if (ps)
             {
                 enemy_platform = ps;
+                enemy_platform->get_impl()->set_h_pos(10);
+                ps->get_impl()->update();
             }
         }
     });
+
+    connect(&timer, &QTimer::timeout, this, &Game::step);
+    timer.start(100);
+}
+
+void Game::step()
+{
+    if (!platform)
+        return;
+
+    int16_t pos = platform->get_pos();
+    if (right_button && !left_button)
+    {
+        pos += 2;
+        set_plarform_pos(pos);
+    }
+    else if (left_button && !right_button)
+    {
+        pos -= 2;
+        set_plarform_pos(pos);
+    }
 }
 
 void Game::create_server(uint16_t port)
@@ -78,7 +136,7 @@ void Game::create_server(uint16_t port)
 
     platform_processor = provider->register_new_class<PlatformProcessor<Platform>>();
     platform = platform_processor->get_object();
-    platform->set_pos(50);
+    platform->set_pos(sceneRect().width() / 2);
 }
 
 void Game::create_client(const QString& addr, uint16_t port)
@@ -91,28 +149,46 @@ void Game::create_client(const QString& addr, uint16_t port)
     platform_processor = provider->register_new_class<PlatformProcessor<Platform>>();
 }
 
-void Game::paintEvent(QPaintEvent* event)
-{
-    int step = width() / 40;
-
-    QPainter painter(this);
-    painter.setPen(Qt::GlobalColor::green);
-
-    for (auto ball : balls)
-        painter.drawEllipse(ball->get_pos(), step, step);
-
-    painter.setPen(Qt::GlobalColor::blue);
-    painter.setBrush(Qt::BrushStyle::SolidPattern);
-
-    if (platform)
-        drawPlatform(platform->get_pos(), painter, step, false);
-    if (enemy_platform)
-        drawPlatform(enemy_platform->get_pos(), painter, step, true);
-}
-
 void Game::drawPlatform(int16_t pos, QPainter& painter, int step, bool on_top)
 {
     QPainterPath path;
     path.addRect(QRect(pos * width() / 100, on_top ? 20 : height() - 20, step * 4, 20));
     painter.drawPath(path);
+}
+
+void Game::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key::Key_Right || event->key() == Qt::Key::Key_D)
+    {
+        right_button = true;
+        qDebug() << "right button is on";
+    }
+    if (event->key() == Qt::Key::Key_Left || event->key() == Qt::Key::Key_A)
+    {
+        left_button = true;
+        qDebug() << "left button is on";
+    }
+}
+
+void Game::keyReleaseEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key::Key_Right || event->key() == Qt::Key::Key_D)
+    {
+        right_button = false;
+        qDebug() << "right button is off";
+    }
+    if (event->key() == Qt::Key::Key_Left || event->key() == Qt::Key::Key_A)
+    {
+        left_button = false;
+        qDebug() << "left button is off";
+    }
+}
+
+void Game::set_plarform_pos(int16_t pos)
+{
+    if (pos < 0)
+        pos = 0;
+    if (pos > sceneRect().width() - Platform::get_width())
+        pos = sceneRect().width() - Platform::get_width();
+    platform->set_pos(pos);
 }
