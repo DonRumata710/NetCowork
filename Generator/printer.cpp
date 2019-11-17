@@ -223,17 +223,14 @@ bool Printer::print_class(const Class& c)
     print_line("}");
     decrease_offset();
     print_line("}");
-
-    decrease_offset();
-    print_line("");
-    print_line("private:");
-    increase_offset();
-
-    print_line("friend class " + processor_class + "<" + c.get_name() + ">;");
     print_line("");
 
     print_line(c.get_name() + "* get_impl() { return impl; }");
     print_line("");
+
+    decrease_offset();
+    print_line("private:");
+    increase_offset();
 
     print_line(c.get_name() + "* impl = nullptr;");
 
