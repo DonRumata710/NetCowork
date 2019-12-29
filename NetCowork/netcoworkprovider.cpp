@@ -2,6 +2,8 @@
 
 #include "netcoworker.h"
 
+#include <QDebug>
+
 
 void NetCoworkProvider::send_func_call(Message& msg, const NetCoworker* obj)
 {
@@ -120,7 +122,15 @@ void NetCoworkProvider::process_func(Message& msg)
 
         if (is_server())
         {
+            if (msg.get_object_id() != UINT32_MAX)
+            {
+                qCritical() << "fake id";
+                return;
+            }
+
             msg.set_object_id(coworkers.size());
+
+            qDebug() << "client object creation:" << msg.get_object_id();
 
             Message responce;
             responce.set_metadata(msg.get_class_id(), msg.get_object_id(), 0);
@@ -150,6 +160,8 @@ void NetCoworkProvider::process_func(Message& msg)
                         }
                     }
                     requests.erase(req_it);
+
+                    qDebug() << "sync message";
                     return;
                 }
             }
@@ -167,6 +179,8 @@ void NetCoworkProvider::process_func(Message& msg)
             if (obj_callback)
                 obj_callback(coworker, msg.get_class_id(), msg.get_object_id());
         }
+
+        qDebug() << "creation message";
     }
 }
 

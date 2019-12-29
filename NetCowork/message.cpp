@@ -1,6 +1,7 @@
 #include "message.h"
 
 #include <QBuffer>
+#include <QDebug>
 
 
 Message::Message() : stream(&data, QIODevice::ReadWrite)
@@ -60,8 +61,26 @@ Message Message::get_message(QIODevice* device)
 {
     QDataStream stream(device);
     stream.setVersion(QDataStream::Qt_5_6);
-    uint16_t size;
-    stream >> size;
+
+    bool size_undefined = true;
+    uint16_t size = sizeof(uint16_t);
+
+    while(true)
+    {
+        if (size_undefined)
+        {
+            if (device->bytesAvailable() < sizeof(uint16_t))
+                break;
+            stream >> size;
+            size_undefined = false;
+        }
+
+        if (device->bytesAvailable() >= size)
+        {
+            qDebug() << "message size:" << size;
+            break;
+        }
+    }
 
     QByteArray data(size, '\0');
     stream.readRawData(data.data(), size);

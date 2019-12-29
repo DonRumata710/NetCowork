@@ -161,12 +161,10 @@ void Game::keyPressEvent(QKeyEvent* event)
     if (event->key() == Qt::Key::Key_Right || event->key() == Qt::Key::Key_D)
     {
         right_button = true;
-        qDebug() << "right button is on";
     }
     if (event->key() == Qt::Key::Key_Left || event->key() == Qt::Key::Key_A)
     {
         left_button = true;
-        qDebug() << "left button is on";
     }
 }
 
@@ -175,12 +173,10 @@ void Game::keyReleaseEvent(QKeyEvent* event)
     if (event->key() == Qt::Key::Key_Right || event->key() == Qt::Key::Key_D)
     {
         right_button = false;
-        qDebug() << "right button is off";
     }
     if (event->key() == Qt::Key::Key_Left || event->key() == Qt::Key::Key_A)
     {
         left_button = false;
-        qDebug() << "left button is off";
     }
 }
 

@@ -75,7 +75,7 @@ void NetCoworkServer::onNewConnection()
 
 void NetCoworkServer::onDataReady()
 {
-    qDebug() << "Data coming";
+    qDebug() << "Data is coming";
 
     QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
     Message msg(Message::get_message(socket));
@@ -86,21 +86,25 @@ void NetCoworkServer::onDataReady()
 
 void NetCoworkServer::send_data(Message& msg)
 {
+    qDebug() << "Send message" << msg.get_class_id() << msg.get_object_id() << msg.get_func_id();
     send_data(msg.get_data());
 }
 
 void NetCoworkServer::send_data(Message&& msg)
 {
+    qDebug() << "Send message" << msg.get_class_id() << msg.get_object_id() << msg.get_func_id();
     send_data(msg.get_data());
 }
 
 void NetCoworkServer::respond(Message& msg)
 {
+    qDebug() << "Respond by message" << msg.get_class_id() << msg.get_object_id() << msg.get_func_id();
     respond(msg.get_data());
 }
 
 void NetCoworkServer::respond(Message&& msg)
 {
+    qDebug() << "Respond by message" << msg.get_class_id() << msg.get_object_id() << msg.get_func_id();
     respond(msg.get_data());
 }
 
@@ -131,10 +135,9 @@ void NetCoworkServer::send_data(const QByteArray& data)
             if (socket->write(data) != data.size())
                 qCritical() << "Failure sending data";
             socket->flush();
+            qDebug() << "socket";
         }
     }
-
-    qDebug() << "Data is sended";
 }
 
 void NetCoworkServer::respond(const QByteArray& data)
