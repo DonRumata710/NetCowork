@@ -52,6 +52,8 @@ STR_TO_ENUM_DELC(Token)
     DO(I32) \
     DO(I16) \
     DO(I8) \
+    DO(FLOAT) \
+    DO(DFLOAT) \
     DO(CHAR) \
     DO(STRING) \
     DO(FUNCTION) \

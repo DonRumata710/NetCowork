@@ -14,6 +14,8 @@ InterfaceModel::InterfaceModel()
         { "i32",    SimpleType(Type_enum::I32   ) },
         { "i16",    SimpleType(Type_enum::I16   ) },
         { "i8",     SimpleType(Type_enum::I8    ) },
+        { "float",  SimpleType(Type_enum::FLOAT ) },
+        { "double", SimpleType(Type_enum::DFLOAT) },
         { "char",   SimpleType(Type_enum::CHAR  ) },
         { "string", SimpleType(Type_enum::STRING) }
     };

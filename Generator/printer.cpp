@@ -55,6 +55,8 @@ bool Printer::print_class(const Class& c)
             case Type_enum::I8:
                 print_dependency("cstdint");
                 break;
+            case Type_enum::FLOAT:
+            case Type_enum::DFLOAT:
             case Type_enum::CHAR:
                 break;
             case Type_enum::STRING:
@@ -385,6 +387,10 @@ std::string Printer::get_type_name(const CodeElement* element)
         return "int16_t";
     case Type_enum::I8:
         return "int8_t";
+    case Type_enum::FLOAT:
+        return "float";
+    case Type_enum::DFLOAT:
+        return "double";
     case Type_enum::CHAR:
         return "char";
     case Type_enum::STRING:

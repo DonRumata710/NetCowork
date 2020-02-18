@@ -12,6 +12,8 @@ std::unordered_map<Type_enum, std::string> type_names = {
     { Type_enum::I32, "i32" },
     { Type_enum::I16, "i16" },
     { Type_enum::I8, "i8" },
+    { Type_enum::FLOAT, "float" },
+    { Type_enum::DFLOAT, "double" },
     { Type_enum::CHAR, "char" },
     { Type_enum::STRING, "string" },
     { Type_enum::STRUCT, "struct" },

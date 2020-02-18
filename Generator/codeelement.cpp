@@ -8,7 +8,7 @@ CodeElement::CodeElement(Type_enum _type, const std::string& _name) :
     name(_name)
 {
     if (!isalpha(name[0]))
-        throw std::runtime_error("syntax error in typename");
+        throw std::runtime_error("syntax error in typename '" + name + "'");
 
     for (char ch : name)
     {
