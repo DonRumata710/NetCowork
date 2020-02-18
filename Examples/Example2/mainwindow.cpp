@@ -17,15 +17,6 @@ enum Pages
 };
 
 
-QMainWindow* getMainWindow()
-{
-    for(QWidget *widget : qApp->topLevelWidgets())
-        if (QMainWindow *mainWindow = qobject_cast<QMainWindow*>(widget))
-            return mainWindow;
-    return nullptr;
-}
-
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)

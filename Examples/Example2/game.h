@@ -55,6 +55,8 @@ private:
     bool right_button = false;
     bool left_button = false;
 
+    const static size_t TIME_STEP = 100;
+
     static Game* instance;
 };
 

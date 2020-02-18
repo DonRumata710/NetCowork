@@ -3,29 +3,45 @@
 #include <QPainter>
 
 
-Ball::Ball(QPoint _pos) : pos(_pos)
-{}
-
-void Ball::set_pos(QPoint new_pos)
+Ball::Ball(QPointF _pos) : QGraphicsEllipseItem(-get_radius(), -get_radius(), get_radius() * 2, get_radius() * 2)
 {
-    pos = new_pos;
+    setPos(_pos);
+    setPen(QPen(Qt::black, 2));
+    setBrush(Qt::red);
+}
+
+void Ball::set_pos(QPointF new_pos)
+{
+    setPos(new_pos);
     update(boundingRect());
 }
 
-QPoint Ball::get_pos() const
+QPointF Ball::get_pos() const
 {
-    return pos;
+    return pos();
 }
 
-QRectF Ball::boundingRect() const
+void Ball::set_direction(float new_direction)
 {
-    return QRectF(pos + QPoint(10, 10) , QSize(20, 20));
+    setRotation(static_cast<double>(new_direction));
 }
 
-void Ball::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+float Ball::get_direction() const
 {
-    painter->setPen(QPen(Qt::red, 2));
-    QPainterPath path;
-    path.addEllipse(boundingRect());
-    painter->drawPath(path);
+    return static_cast<float>(rotation());
+}
+
+void Ball::set_speed(float new_speed)
+{
+    speed = new_speed;
+}
+
+float Ball::get_speed() const
+{
+    return speed;
+}
+
+float Ball::get_radius()
+{
+    return 10.0f;
 }

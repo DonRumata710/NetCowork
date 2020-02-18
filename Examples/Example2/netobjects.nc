@@ -1,5 +1,5 @@
 
-import struct QPoint;
+import struct QPointF;
 
 
 class Platform
@@ -9,5 +9,7 @@ class Platform
 
 class Ball
 {
-    QPoint pos;
+    QPointF pos;
+    float direction;
+    float speed;
 };

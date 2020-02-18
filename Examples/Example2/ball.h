@@ -3,25 +3,36 @@
 
 #include <QPoint>
 #include <QObject>
-#include <QGraphicsItem>
+#include <QGraphicsEllipseItem>
+#include <QDebug>
 
 
-class Ball : public QObject, public QGraphicsItem
+class Ball : public QObject, public QGraphicsEllipseItem
 {
     Q_OBJECT
 
 public:
-    Ball(QPoint pos = QPoint());
+    Ball(QPointF pos = QPointF());
+    ~Ball()
+    {
+        qDebug() << "delete object";
+    }
 
-    void set_pos(QPoint new_pos);
-    QPoint get_pos() const;
+    void set_pos(QPointF new_pos);
+    QPointF get_pos() const;
 
-protected:
-    QRectF boundingRect() const override;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    void set_direction(float new_direction);
+
+    float get_direction() const;
+
+    void set_speed(float new_speed);
+
+    float get_speed() const;
+
+    static float get_radius();
 
 private:
-    QPoint pos;
+    float speed;
 };
 
 #endif // BALL_H

@@ -7,6 +7,8 @@
 #include <QGraphicsScene>
 #include <QKeyEvent>
 
+#include <cmath>
+
 
 Game* Game::instance(nullptr);
 
@@ -16,7 +18,9 @@ Ball* BallProcessor<Ball>::generate_object() const
 {
     Ball* ball = new Ball;
     Game::get_instance()->add_item(ball);
-    ball->set_pos({ int(Game::get_instance()->sceneRect().width() / 2), int(Game::get_instance()->sceneRect().height() / 2) });
+    ball->set_pos({ float(Game::get_instance()->sceneRect().width() / 2), float(Game::get_instance()->sceneRect().height() / 2) });
+    ball->set_direction(rand() % 360);
+    ball->set_speed(5);
     return ball;
 }
 
@@ -103,13 +107,51 @@ void Game::start(uint16_t port, const QString& addr)
     });
 
     connect(&timer, &QTimer::timeout, this, &Game::step);
-    timer.start(100);
+    timer.start(TIME_STEP);
 }
 
 void Game::step()
 {
     if (!platform)
         return;
+
+    for (const auto& ball : balls)
+    {
+        auto distance = ball->get_speed();
+        auto new_pos = ball->get_impl()->mapToScene(0, -distance);
+        float dir = ball->get_direction() / 360;
+        QPointF move_vector = QPointF(distance * cos(dir), distance * sin(dir));
+
+        bool right_collision = new_pos.rx() - Ball::get_radius() < 0;
+        bool left_collision = new_pos.rx() + Ball::get_radius() > scene()->width();
+        bool top_collision = new_pos.ry() - Ball::get_radius() < 0;
+        bool botton_collision = new_pos.ry() - Ball::get_radius() > scene()->height();
+
+        if (right_collision || left_collision)
+        {
+            move_vector.setX(-move_vector.rx());
+
+            if (right_collision)
+                new_pos.setX(Ball::get_radius() + Ball::get_radius() - new_pos.rx());
+            else if (left_collision)
+                new_pos.setX(scene()->width() + scene()->width() - new_pos.rx() - Ball::get_radius() - Ball::get_radius());
+        }
+
+        if (top_collision || botton_collision)
+        {
+            move_vector.setY(-move_vector.ry());
+
+            if (top_collision)
+                new_pos.setY(Ball::get_radius() + Ball::get_radius() - new_pos.ry());
+            else if (botton_collision)
+                new_pos.setY(scene()->height() + scene()->height() - new_pos.ry() - Ball::get_radius() - Ball::get_radius());
+        }
+
+        if (right_collision || left_collision || top_collision || botton_collision)
+            ball->set_direction(atan2(move_vector.rx() / distance, move_vector.ry() / distance) * 360);
+
+        ball->set_pos(new_pos);
+    }
 
     int16_t pos = platform->get_pos();
     if (right_button && !left_button)
