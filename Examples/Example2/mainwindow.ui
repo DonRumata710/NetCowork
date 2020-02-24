@@ -20,6 +20,12 @@
    <string>MainWindow</string>
   </property>
   <widget class="QStackedWidget" name="stackedWidget">
+   <property name="minimumSize">
+    <size>
+     <width>500</width>
+     <height>500</height>
+    </size>
+   </property>
    <property name="currentIndex">
     <number>0</number>
    </property>

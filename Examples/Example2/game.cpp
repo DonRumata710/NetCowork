@@ -7,7 +7,8 @@
 #include <QGraphicsScene>
 #include <QKeyEvent>
 
-#include <cmath>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 
 Game* Game::instance(nullptr);
@@ -20,7 +21,7 @@ Ball* BallProcessor<Ball>::generate_object() const
     Game::get_instance()->add_item(ball);
     ball->set_pos({ float(Game::get_instance()->sceneRect().width() / 2), float(Game::get_instance()->sceneRect().height() / 2) });
     ball->set_direction(rand() % 360);
-    ball->set_speed(5);
+    ball->set_speed(2.5);
     return ball;
 }
 
@@ -119,22 +120,22 @@ void Game::step()
     {
         auto distance = ball->get_speed();
         auto new_pos = ball->get_impl()->mapToScene(0, -distance);
-        float dir = ball->get_direction() / 360;
+        float dir = (ball->get_direction() - 90) / 180 * M_PI;
         QPointF move_vector = QPointF(distance * cos(dir), distance * sin(dir));
 
-        bool right_collision = new_pos.rx() - Ball::get_radius() < 0;
-        bool left_collision = new_pos.rx() + Ball::get_radius() > scene()->width();
+        bool right_collision = new_pos.rx() + Ball::get_radius() > scene()->width();
+        bool left_collision = new_pos.rx() - Ball::get_radius() < 0;
         bool top_collision = new_pos.ry() - Ball::get_radius() < 0;
-        bool botton_collision = new_pos.ry() - Ball::get_radius() > scene()->height();
+        bool botton_collision = new_pos.ry() + Ball::get_radius() > scene()->height();
 
         if (right_collision || left_collision)
         {
             move_vector.setX(-move_vector.rx());
 
             if (right_collision)
-                new_pos.setX(Ball::get_radius() + Ball::get_radius() - new_pos.rx());
-            else if (left_collision)
                 new_pos.setX(scene()->width() + scene()->width() - new_pos.rx() - Ball::get_radius() - Ball::get_radius());
+            else if (left_collision)
+                new_pos.setX(Ball::get_radius() + Ball::get_radius() - new_pos.rx());
         }
 
         if (top_collision || botton_collision)
@@ -148,7 +149,7 @@ void Game::step()
         }
 
         if (right_collision || left_collision || top_collision || botton_collision)
-            ball->set_direction(atan2(move_vector.rx() / distance, move_vector.ry() / distance) * 360);
+            ball->set_direction(atan2(move_vector.ry() / distance, move_vector.rx() / distance) / M_PI * 180 + 90);
 
         ball->set_pos(new_pos);
     }
