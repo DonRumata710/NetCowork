@@ -13,10 +13,7 @@ class Ball : public QObject, public QGraphicsEllipseItem
 
 public:
     Ball(QPointF pos = QPointF());
-    ~Ball()
-    {
-        qDebug() << "delete object";
-    }
+    ~Ball() = default;
 
     void set_pos(QPointF new_pos);
     QPointF get_pos() const;
@@ -31,8 +28,12 @@ public:
 
     static float get_radius();
 
+    static void set_y_inversion(bool);
+
 private:
     float speed;
+
+    static bool y_inversion;
 };
 
 #endif // BALL_H

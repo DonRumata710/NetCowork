@@ -44,6 +44,8 @@ private:
 
     void set_plarform_pos(int16_t pos);
 
+    void game_inner_logic();
+
 private:
     std::unique_ptr<NetCoworkProvider> provider;
     std::vector<BallSync<Ball>*> balls;

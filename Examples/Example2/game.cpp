@@ -19,7 +19,8 @@ Ball* BallProcessor<Ball>::generate_object() const
 {
     Ball* ball = new Ball;
     Game::get_instance()->add_item(ball);
-    ball->set_pos({ float(Game::get_instance()->sceneRect().width() / 2), float(Game::get_instance()->sceneRect().height() / 2) });
+    QPointF sceneCenter = Game::get_instance()->sceneRect().center();
+    ball->set_pos({ sceneCenter.rx(), sceneCenter.ry() });
     ball->set_direction(rand() % 360);
     ball->set_speed(2.5);
     return ball;
@@ -31,7 +32,7 @@ Platform* PlatformProcessor<Platform>::generate_object() const
 {
     Platform* platform = new Platform;
     Game::get_instance()->add_item(platform);
-    platform->set_h_pos(480);
+    platform->set_h_pos(230);
     return platform;
 }
 
@@ -49,7 +50,7 @@ Game::Game(QWidget* parent) :
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); /// Отключаем скроллбар по вертикали
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); /// Отключаем скроллбар по горизонтали
 
-    scene()->setSceneRect(0, 0, 500, 500);
+    scene()->setSceneRect(0, -250, 500, 500);
 }
 
 Game::~Game()
@@ -80,7 +81,7 @@ void Game::start(uint16_t port, const QString& addr)
         {
             platform = platform_processor->get_object();
             platform->set_pos(sceneRect().width() / 2);
-            platform->get_impl()->set_h_pos(480);
+            platform->get_impl()->set_h_pos(230);
         }
     });
 
@@ -91,6 +92,7 @@ void Game::start(uint16_t port, const QString& addr)
             BallSync<Ball>* bs = dynamic_cast<BallSync<Ball>*>(p_obj);
             if (bs)
             {
+                Game::get_instance()->add_item(bs->get_impl());
                 balls.push_back(bs);
                 bs->get_impl()->update();
             }
@@ -101,7 +103,7 @@ void Game::start(uint16_t port, const QString& addr)
             if (ps)
             {
                 enemy_platform = ps;
-                enemy_platform->get_impl()->set_h_pos(10);
+                enemy_platform->get_impl()->set_h_pos(-230);
                 ps->get_impl()->update();
             }
         }
@@ -116,43 +118,7 @@ void Game::step()
     if (!platform)
         return;
 
-    for (const auto& ball : balls)
-    {
-        auto distance = ball->get_speed();
-        auto new_pos = ball->get_impl()->mapToScene(0, -distance);
-        float dir = (ball->get_direction() - 90) / 180 * M_PI;
-        QPointF move_vector = QPointF(distance * cos(dir), distance * sin(dir));
-
-        bool right_collision = new_pos.rx() + Ball::get_radius() > scene()->width();
-        bool left_collision = new_pos.rx() - Ball::get_radius() < 0;
-        bool top_collision = new_pos.ry() - Ball::get_radius() < 0;
-        bool botton_collision = new_pos.ry() + Ball::get_radius() > scene()->height();
-
-        if (right_collision || left_collision)
-        {
-            move_vector.setX(-move_vector.rx());
-
-            if (right_collision)
-                new_pos.setX(scene()->width() + scene()->width() - new_pos.rx() - Ball::get_radius() - Ball::get_radius());
-            else if (left_collision)
-                new_pos.setX(Ball::get_radius() + Ball::get_radius() - new_pos.rx());
-        }
-
-        if (top_collision || botton_collision)
-        {
-            move_vector.setY(-move_vector.ry());
-
-            if (top_collision)
-                new_pos.setY(Ball::get_radius() + Ball::get_radius() - new_pos.ry());
-            else if (botton_collision)
-                new_pos.setY(scene()->height() + scene()->height() - new_pos.ry() - Ball::get_radius() - Ball::get_radius());
-        }
-
-        if (right_collision || left_collision || top_collision || botton_collision)
-            ball->set_direction(atan2(move_vector.ry() / distance, move_vector.rx() / distance) / M_PI * 180 + 90);
-
-        ball->set_pos(new_pos);
-    }
+    game_inner_logic();
 
     int16_t pos = platform->get_pos();
     if (right_button && !left_button)
@@ -169,6 +135,8 @@ void Game::step()
 
 void Game::create_server(uint16_t port)
 {
+    Ball::set_y_inversion(false);
+
     NetCoworkServer* server = new NetCoworkServer;
     server->start("*", port);
     server->set_creation_policy(NetCoworkServer::CreationPolicy::ALL);
@@ -184,6 +152,8 @@ void Game::create_server(uint16_t port)
 
 void Game::create_client(const QString& addr, uint16_t port)
 {
+    Ball::set_y_inversion(true);
+
     NetCoworkClient* client = new NetCoworkClient;
     client->start(addr.toStdString(), port);
     provider.reset(client);
@@ -230,4 +200,49 @@ void Game::set_plarform_pos(int16_t pos)
     if (pos > sceneRect().width() - Platform::get_width())
         pos = sceneRect().width() - Platform::get_width();
     platform->set_pos(pos);
+}
+
+void Game::game_inner_logic()
+{
+    for (const auto& net_ball : balls)
+    {
+        auto ball = net_ball->get_impl();
+
+        auto distance = ball->get_speed();
+        auto new_pos = ball->mapToScene(0, -distance);
+        float dir = (ball->get_direction() - 90) / 180 * M_PI;
+        QPointF move_vector = QPointF(distance * cos(dir), distance * sin(dir));
+
+        QRectF rect = scene()->sceneRect();
+
+        bool right_collision = new_pos.rx() + Ball::get_radius() > rect.right();
+        bool left_collision = new_pos.rx() - Ball::get_radius() < rect.left();
+        bool top_collision = new_pos.ry() - Ball::get_radius() < rect.top();
+        bool botton_collision = new_pos.ry() + Ball::get_radius() > rect.bottom();
+
+        if (right_collision || left_collision)
+        {
+            move_vector.setX(-move_vector.rx());
+
+            if (right_collision)
+                new_pos.setX(rect.right() + rect.right() - new_pos.rx() - Ball::get_radius() - Ball::get_radius());
+            else if (left_collision)
+                new_pos.setX(rect.left() + rect.left() - new_pos.rx() + Ball::get_radius() + Ball::get_radius());
+        }
+
+        if (top_collision || botton_collision)
+        {
+            move_vector.setY(-move_vector.ry());
+
+            if (top_collision)
+                new_pos.setY(rect.top() + rect.top() - new_pos.ry() + Ball::get_radius() + Ball::get_radius());
+            else if (botton_collision)
+                new_pos.setY(rect.bottom() + rect.bottom() - new_pos.ry() - Ball::get_radius() - Ball::get_radius());
+        }
+
+        if (right_collision || left_collision || top_collision || botton_collision)
+            ball->set_direction(atan2(move_vector.ry() / distance, move_vector.rx() / distance) / M_PI * 180 + 90);
+
+        ball->setPos(new_pos);
+    }
 }
