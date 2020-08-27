@@ -1,6 +1,7 @@
 #include "codeelement.h"
 
 #include <cctype>
+#include <stdexcept>
 
 
 CodeElement::CodeElement(Type_enum _type, const std::string& _name) :

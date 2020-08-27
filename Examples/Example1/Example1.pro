@@ -32,6 +32,9 @@ HEADERS += \
         mainwindow.h \
         $$OUT_PWD/generated/NetObject_net.h
 
+DISTFILES += \
+    netobject.nc
+
 INCLUDEPATH += \
     $$PWD/../include \
     $$OUT_PWD

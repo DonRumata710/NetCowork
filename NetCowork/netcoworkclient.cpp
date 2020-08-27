@@ -1,5 +1,7 @@
 #include "netcoworkclient.h"
 
+#include <stdexcept>
+
 
 NetCoworkClient::NetCoworkClient() :
     socket(this)

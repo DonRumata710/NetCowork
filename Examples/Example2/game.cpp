@@ -45,10 +45,10 @@ Game::Game(QWidget* parent) :
 
     instance = this;
 
-    setScene(new QGraphicsScene);  /// Устанавливаем графическую сцену в graphicsView
-    setRenderHint(QPainter::Antialiasing);    /// Устанавливаем сглаживание
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); /// Отключаем скроллбар по вертикали
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); /// Отключаем скроллбар по горизонтали
+    setScene(new QGraphicsScene);
+    setRenderHint(QPainter::Antialiasing);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     scene()->setSceneRect(0, -250, 500, 500);
 }

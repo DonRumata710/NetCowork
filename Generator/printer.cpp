@@ -82,6 +82,7 @@ bool Printer::print_class(const Class& c)
 
     print_line("#include \"netcoworker.h\"");
     print_line("#include \"netcoworkfactory.h\"");
+    print_line("#include <stdexcept>");
 
     print_line("");
     print_line("");

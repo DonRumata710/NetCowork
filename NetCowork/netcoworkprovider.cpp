@@ -4,6 +4,8 @@
 
 #include <QDebug>
 
+#include <stdexcept>
+
 
 void NetCoworkProvider::send_func_call(Message& msg, const NetCoworker* obj)
 {
@@ -144,7 +146,9 @@ void NetCoworkProvider::process_func(Message& msg)
                 if (obj->get_class_id() == msg.get_class_id())
                 {
                     obj->set_object_id(msg.get_object_id());
-                    for (auto deffered_msg = messages.begin(); deffered_msg < messages.end(); ++deffered_msg)
+
+                    auto deffered_msg = messages.begin();
+                    while (deffered_msg < messages.end())
                     {
                         if (deffered_msg->second->get_object_id() == msg.get_object_id() && deffered_msg->second->get_class_id() == msg.get_class_id())
                         {
@@ -153,10 +157,10 @@ void NetCoworkProvider::process_func(Message& msg)
 
                             send_data(deffered_msg->first);
                             deffered_msg = messages.erase(deffered_msg);
-                            if (deffered_msg == messages.end())
-                                break;
-                            if (deffered_msg != messages.begin())
-                                --deffered_msg;
+                        }
+                        else
+                        {
+                            ++deffered_msg;
                         }
                     }
                     requests.erase(req_it);
