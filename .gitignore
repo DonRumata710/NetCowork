@@ -3,4 +3,4 @@
 *.exe
 *.pro.user
 *.pro.user.*
-
+*.autosave
