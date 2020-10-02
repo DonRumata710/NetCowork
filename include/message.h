@@ -2,6 +2,9 @@
 #define MESSAGE_H
 
 #include <QDataStream>
+#include <QString>
+
+#include <string>
 
 
 class Message

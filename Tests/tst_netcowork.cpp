@@ -1,6 +1,6 @@
 #include <QtTest>
 
-#include <Message.h>
+#include <message.h>
 
 
 class NetCowork : public QObject

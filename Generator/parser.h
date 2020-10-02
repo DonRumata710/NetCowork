@@ -58,4 +58,4 @@ private:
     FileHandler* handler;
 };
 
-#endif // GENERATOR_H
+#endif
