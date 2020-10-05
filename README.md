@@ -1,5 +1,5 @@
 # NetCowork
-Library for sychronization objects on remote processes<br>
+Library for synchronization objects on remote processes<br>
 
 ## Structure of project
 - Example - example of using library
