@@ -69,7 +69,7 @@ bool Printer::print_class(const Class& c)
                 print_dependency(dependency->get_name() + ".h");
                 break;
             default:
-                throw std::logic_error("unknown type in printer");
+                throw std::logic_error("unknown dependency type in printer");
             }
         }
         else
@@ -404,7 +404,7 @@ std::string Printer::get_type_name(const CodeElement* element)
     case Type_enum::ENUM:
         return element->get_name();
     default:
-        throw std::logic_error("unknown type in printer");
+        throw std::logic_error("unknown type in printer: \"" + element->get_name() + "\"");
     }
 }
 

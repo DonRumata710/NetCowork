@@ -17,8 +17,12 @@ public:
     Class(Class&& other);
 
     void add_dependency(const Dependency* dependency);
+
     void add_property(const Property& type);
     void add_property(Property&& type);
+    void add_properties(const std::vector<Property>& properties);
+    void add_properties(std::vector<Property>&& properties);
+
     void add_function(const Function& func);
     void add_function(Function&& func);
 
@@ -29,6 +33,7 @@ public:
 
 private:
     void add_dependencies(const Function& func);
+    void add_properties_dependency(const std::vector<Property>& properties);
 
 private:
     std::vector<Property> properties;

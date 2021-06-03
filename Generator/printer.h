@@ -13,7 +13,7 @@
 class Printer
 {
 public:
-    explicit Printer(const std::string& folder_path = std::string());
+    explicit Printer(const std::string& folder_path = std::string("."));
 
     bool print_class(const Class& c);
 

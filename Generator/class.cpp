@@ -36,6 +36,17 @@ void Class::add_property(Property&& property)
     properties.emplace_back(std::move(property));
 }
 
+void Class::add_properties(const std::vector<Property>& new_properties)
+{
+    properties = new_properties;
+    add_properties_dependency(properties);
+}
+
+void Class::add_properties(std::vector<Property>&& new_properties)
+{
+    properties = std::move(new_properties);
+}
+
 void Class::add_function(const Function& func)
 {
     add_dependencies(func);
@@ -67,4 +78,12 @@ void Class::add_dependencies(const Function& func)
 {
     for (size_t i = 0; i < func.get_params_count(); ++i)
         dependencies.insert(func.get_param(i)->element);
+}
+
+void Class::add_properties_dependency(const std::vector<Property>& properties)
+{
+    for (const auto& property : properties)
+    {
+        dependencies.insert(property.parameter.element);
+    }
 }
