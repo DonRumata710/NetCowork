@@ -25,7 +25,7 @@
 
 
 ENUM_WITH_NAMES(Token)
-STR_TO_ENUM_DELC(Token)
+STR_TO_ENUM_DECL(Token)
 
 
 //enum class Token
@@ -44,26 +44,28 @@ STR_TO_ENUM_DELC(Token)
 
 
 #define Type(DO) \
-    DO(UI64) \
-    DO(UI32) \
-    DO(UI16) \
-    DO(UI8) \
-    DO(I64) \
-    DO(I32) \
-    DO(I16) \
-    DO(I8) \
-    DO(FLOAT) \
-    DO(DFLOAT) \
-    DO(CHAR) \
-    DO(STRING) \
-    DO(FUNCTION) \
-    DO(STRUCT) \
-    DO(CLASS) \
-    DO(ENUM) \
-    DO(NONE)
+    DO(Type, NONE,     "NONE") \
+    DO(Type, UI64,     "ui64") \
+    DO(Type, UI32,     "ui32") \
+    DO(Type, UI16,     "ui16") \
+    DO(Type, UI8,      "ui8") \
+    DO(Type, I64,      "i64") \
+    DO(Type, I32,      "i32") \
+    DO(Type, I16,      "i16") \
+    DO(Type, I8,       "i8") \
+    DO(Type, FLOAT,    "float") \
+    DO(Type, DFLOAT,   "double") \
+    DO(Type, CHAR,     "char") \
+    DO(Type, STRING,   "string") \
+    DO(Type, FUNCTION, "FUNCTION") \
+    DO(Type, STRUCT,   "STRUCT") \
+    DO(Type, CLASS,    "CLASS") \
+    DO(Type, ENUM,     "ENUM")
 
 
-ENUM_C(Type)
+ENUM_C_WITH_NAMES(Type)
+STR_TO_ENUM_DECL(Type)
+ENUM_TO_STR_DECL(Type)
 
 
 //enum class Type
