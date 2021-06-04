@@ -1,12 +1,14 @@
 #include <iostream>
+#include <filesystem>
 
-#include "parser.h"
+#include "interface.lexer.hpp"
+#include "interface.parser.hpp"
 #include "printer.h"
 
 
 int main(int argc, char** argv)
 {
-    std::vector<std::string> input;
+    std::vector<std::filesystem::path> input;
     std::string output_folder;
 
     for(int i = 1; i < argc; ++i)
@@ -35,13 +37,34 @@ int main(int argc, char** argv)
 
     try
     {
-        Parser g(input, output_folder);
-        Printer p(output_folder);
-        g.parse().print(p);
+        for (const auto& filename : input)
+        {
+            InterfaceModel model;
+            std::vector<std::string> errors;
+
+            if (!std::filesystem::exists(filename))
+            {
+                std::cerr << "File \"" << filename.string() << "\" does not exists";
+                return -2;
+            }
+
+            std::ifstream file(filename);
+            yy::scanner scanner(file, &std::cout);
+            yy::parser parser(filename.parent_path().string(), scanner, model, errors);
+            int res = parser.parse();
+            if (res)
+            {
+                throw std::runtime_error("Parsing was failed with code " + std::to_string(res) + "\n");
+            }
+
+            Printer p(output_folder);
+            model.print(p);
+        }
     }
     catch (const std::exception& err)
     {
         std::cerr << err.what() << '\n';
+        return -3;
     }
 
     return 0;
