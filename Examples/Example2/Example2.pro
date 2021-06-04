@@ -40,7 +40,7 @@ HEADERS += \
         platform.h
 
 DISTFILES += \
-    netobject.nc
+    netobjects.nc
 
 INCLUDEPATH += \
     $$PWD/../include \
@@ -49,13 +49,21 @@ INCLUDEPATH += \
 FORMS += \
         mainwindow.ui
 
-netcowork.target = \
+netcowork_ball.target = $$OUT_PWD/generated/Ball_net.h
+netcowork_ball.depends = $$PWD/netobjects.nc
+CONFIG(release, debug|release): netcowork_ball.commands = $$OUT_PWD/../../Generator/release/Generator -i $$PWD/netobjects.nc -o $$OUT_PWD/generated
+CONFIG(debug, debug|release): netcowork_ball.commands = $$OUT_PWD/../../Generator/debug/Generator -i $$PWD/netobjects.nc -o $$OUT_PWD/generated
+QMAKE_EXTRA_TARGETS += netcowork_ball
+
+netcowork_platform.target = $$OUT_PWD/generated/Platform_net.h
+netcowork_platform.depends = $$PWD/netobjects.nc
+CONFIG(release, debug|release): netcowork_ball.commands = $$OUT_PWD/../../Generator/release/Generator -i $$PWD/netobjects.nc -o $$OUT_PWD/generated
+CONFIG(debug, debug|release): netcowork_ball.commands = $$OUT_PWD/../../Generator/debug/Generator -i $$PWD/netobjects.nc -o $$OUT_PWD/generated
+QMAKE_EXTRA_TARGETS += netcowork_platform
+
+PRE_TARGETDEPS += \
     $$OUT_PWD/generated/Ball_net.h \
     $$OUT_PWD/generated/Platform_net.h
-netcowork.depends = $$PWD/netobjects.nc
-CONFIG(release, debug|release): netcowork.commands = $$OUT_PWD/../../Generator/release/Generator -i $$PWD/netobjects.nc -o $$OUT_PWD/generated
-CONFIG(debug, debug|release): netcowork.commands = $$OUT_PWD/../../Generator/debug/Generator -i $$PWD/netobjects.nc -o $$OUT_PWD/generated
-QMAKE_EXTRA_TARGETS += netcowork
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

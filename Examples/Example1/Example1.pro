@@ -48,6 +48,8 @@ CONFIG(release, debug|release): netcowork.commands = $$OUT_PWD/../../Generator/r
 CONFIG(debug, debug|release): netcowork.commands = $$OUT_PWD/../../Generator/debug/Generator -i $$PWD/netobject.nc -o generated
 QMAKE_EXTRA_TARGETS += netcowork
 
+PRE_TARGETDEPS += $$OUT_PWD/generated/NetObject_net.h
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
