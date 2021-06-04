@@ -78,21 +78,15 @@
     };
 
 
+#define STR_TO_ENUM_DECL(NAME) extern std::unordered_map<std::string, NAME##_enum> NAME##_from_str;
+
+
 #define DECLARE_STR_TO_ENUM(VAL) { #VAL, VAL },
 #define DECLARE_STR_TO_ENUM_WITH_NAMES(VAL, STR) { STR, VAL },
 #define DECLARE_STR_TO_ENUM_WITH_VAL(NAME, VAL) { #NAME, NAME },
 #define DECLARE_STR_TO_ENUM_WITH_VAL_NAMES(NAME, VAL, STR) { STR, NAME },
 #define DECLARE_STR_TO_ENUM_WITH_NAMES_VAL(NAME, STR, VAL) { STR, NAME },
 
-
-#define DECLARE_STR_TO_ENUM_C(TYPE, VAL) { #VAL, TYPE##_enum::##VAL },
-#define DECLARE_STR_TO_ENUM_C_WITH_NAMES(TYPE, VAL, STR) { STR, TYPE##_enum::##VAL },
-#define DECLARE_STR_TO_ENUM_C_WITH_VAL(TYPE, NAME, VAL) { #NAME, TYPE##_enum::##NAME },
-#define DECLARE_STR_TO_ENUM_C_WITH_VAL_NAMES(TYPE, NAME, VAL, STR) { STR, TYPE##_enum::##NAME },
-#define DECLARE_STR_TO_ENUM_C_WITH_NAMES_VAL(TYPE, NAME, STR, VAL) { STR, TYPE##_enum::##NAME },
-
-
-#define STR_TO_ENUM_DECL(NAME) extern std::unordered_map<std::string, NAME##_enum> NAME##_from_str;
 
 #define STR_TO_ENUM(NAME) \
     std::unordered_map<std::string, NAME##_enum> NAME##_from_str = { \
@@ -118,6 +112,13 @@
     std::unordered_map<std::string, NAME##_enum> NAME##_from_str = { \
         NAME(DECLARE_STR_TO_ENUM_WITH_NAMES_VAL) \
     };
+
+
+#define DECLARE_STR_TO_ENUM_C(TYPE, VAL) { #VAL, TYPE##_enum::##VAL },
+#define DECLARE_STR_TO_ENUM_C_WITH_NAMES(TYPE, VAL, STR) { STR, TYPE##_enum::##VAL },
+#define DECLARE_STR_TO_ENUM_C_WITH_VAL(TYPE, NAME, VAL) { #NAME, TYPE##_enum::##NAME },
+#define DECLARE_STR_TO_ENUM_C_WITH_VAL_NAMES(TYPE, NAME, VAL, STR) { STR, TYPE##_enum::##NAME },
+#define DECLARE_STR_TO_ENUM_C_WITH_NAMES_VAL(TYPE, NAME, STR, VAL) { STR, TYPE##_enum::##NAME },
 
 
 #define STR_TO_ENUM_C(NAME) \
@@ -146,6 +147,8 @@
     };
 
 
+#define ENUM_TO_STR_DECL(NAME) extern std::unordered_map<NAME##_enum, std::string> NAME##_to_str;
+
 
 #define DECLARE_ENUM_TO_STR(VAL) { VAL, #VAL },
 #define DECLARE_ENUM_TO_STR_WITH_NAMES(VAL, STR) { VAL, STR },
@@ -153,8 +156,6 @@
 #define DECLARE_ENUM_TO_STR_WITH_VAL_NAMES(NAME, VAL, STR) { NAME, STR },
 #define DECLARE_ENUM_TO_STR_WITH_NAMES_VAL(NAME, STR, VAL) { NAME, STR },
 
-
-#define ENUM_TO_STR_DECL(NAME) extern std::unordered_map<NAME##_enum, std::string> NAME##_to_str;
 
 #define ENUM_TO_STR(NAME) \
     std::unordered_map<NAME##_enum, std::string> NAME##_to_str = { \

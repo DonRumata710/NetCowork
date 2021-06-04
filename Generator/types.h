@@ -57,10 +57,10 @@ STR_TO_ENUM_DECL(Token)
     DO(Type, DFLOAT,   "double") \
     DO(Type, CHAR,     "char") \
     DO(Type, STRING,   "string") \
-    DO(Type, FUNCTION, "FUNCTION") \
-    DO(Type, STRUCT,   "STRUCT") \
-    DO(Type, CLASS,    "CLASS") \
-    DO(Type, ENUM,     "ENUM")
+    DO(Type, FUNCTION, "function") \
+    DO(Type, STRUCT,   "struct") \
+    DO(Type, CLASS,    "class") \
+    DO(Type, ENUM,     "enum")
 
 
 ENUM_C_WITH_NAMES(Type)
