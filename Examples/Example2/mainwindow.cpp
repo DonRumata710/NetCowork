@@ -52,6 +52,11 @@ void MainWindow::on_buttonBox_accepted()
     else
         address.clear();
 
+    if (address.isEmpty())
+        setWindowTitle("Server");
+    else
+        setWindowTitle("Client");
+
     port = ui->port->value();
 }
 

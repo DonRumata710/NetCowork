@@ -25,6 +25,7 @@ public:
     static uint16_t get_width();
 
 protected:
+    QRectF realRect() const;
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 

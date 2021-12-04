@@ -32,7 +32,6 @@ Platform* PlatformProcessor<Platform>::generate_object() const
 {
     Platform* platform = new Platform;
     Game::get_instance()->add_item(platform);
-    platform->set_h_pos(230);
     return platform;
 }
 
@@ -81,12 +80,12 @@ void Game::start(uint16_t port, const QString& addr)
         {
             platform = platform_processor->get_object();
             platform->set_pos(sceneRect().width() / 2);
-            platform->get_impl()->set_h_pos(230);
+            platform->get_impl()->set_h_pos(-sceneRect().height() / 2 + 20);
         }
     });
 
     provider->set_add_object_callback([this](NetCoworker* p_obj, uint32_t class_id, uint32_t obj_id) {
-        qDebug() << "Object created id:" << obj_id << ", class:" << class_id;
+        qDebug() << "Created object id:" << obj_id << ", class:" << class_id;
         if (class_id == ball_processor->get_class_id())
         {
             BallSync<Ball>* bs = dynamic_cast<BallSync<Ball>*>(p_obj);
@@ -102,8 +101,11 @@ void Game::start(uint16_t port, const QString& addr)
             PlatformSync<Platform>* ps = dynamic_cast<PlatformSync<Platform>*>(p_obj);
             if (ps)
             {
-                enemy_platform = ps;
-                enemy_platform->get_impl()->set_h_pos(-230);
+                opponent_platform = ps;
+                if (isServer)
+                    opponent_platform->get_impl()->set_h_pos(-sceneRect().height() / 2 + 20);
+                else
+                    opponent_platform->get_impl()->set_h_pos(sceneRect().height() / 2 - 20);
                 ps->get_impl()->update();
             }
         }
@@ -115,28 +117,29 @@ void Game::start(uint16_t port, const QString& addr)
 
 void Game::step()
 {
-    if (!platform)
+    if (!platform || !opponent_platform)
         return;
 
     game_inner_logic();
 
     int16_t pos = platform->get_pos();
-    if (right_button && !left_button)
+    if ((right_button && !left_button && isServer) ||
+        (left_button && !right_button && !isServer)
+    )
     {
         pos += 2;
-        set_plarform_pos(pos);
     }
-    else if (left_button && !right_button)
+    else if ((left_button && !right_button && isServer) ||
+             (right_button && !left_button && !isServer)
+    )
     {
         pos -= 2;
-        set_plarform_pos(pos);
     }
+    set_plarform_pos(pos);
 }
 
 void Game::create_server(uint16_t port)
 {
-    Ball::set_y_inversion(false);
-
     NetCoworkServer* server = new NetCoworkServer;
     server->start("*", port);
     server->set_creation_policy(NetCoworkServer::CreationPolicy::ALL);
@@ -148,18 +151,23 @@ void Game::create_server(uint16_t port)
     platform_processor = provider->register_new_class<PlatformProcessor<Platform>>();
     platform = platform_processor->get_object();
     platform->set_pos(sceneRect().width() / 2);
+    platform->get_impl()->set_h_pos(sceneRect().height() / 2 - 20);
+
+    isServer = true;
 }
 
 void Game::create_client(const QString& addr, uint16_t port)
 {
-    Ball::set_y_inversion(true);
-
     NetCoworkClient* client = new NetCoworkClient;
     client->start(addr.toStdString(), port);
     provider.reset(client);
 
     ball_processor = provider->register_new_class<BallProcessor<Ball>>();
     platform_processor = provider->register_new_class<PlatformProcessor<Platform>>();
+
+    rotate(180);
+
+    isServer = false;
 }
 
 void Game::drawPlatform(int16_t pos, QPainter& painter, int step, bool on_top)

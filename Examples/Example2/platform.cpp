@@ -34,15 +34,24 @@ uint16_t Platform::get_width()
     return width;
 }
 
-QRectF Platform::boundingRect() const
+QRectF Platform::realRect() const
 {
     return { qreal(pos), qreal(h_pos), qreal(get_width()), 10 };
+}
+
+QRectF Platform::boundingRect() const
+{
+    QRectF br(realRect());
+    br.setLeft(br.left() - 10);
+    br.setTop(br.top() - 10);
+    br.setSize(br.size() + QSize{ 20, 20 });
+    return br;
 }
 
 void Platform::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     painter->setPen(QPen(Qt::black, 2));
     QPainterPath path;
-    path.addRect(boundingRect());
+    path.addRect(realRect());
     painter->drawPath(path);
 }

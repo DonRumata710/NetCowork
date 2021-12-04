@@ -51,11 +51,12 @@ private:
     std::vector<BallSync<Ball>*> balls;
     BallProcessor<Ball>* ball_processor = nullptr;
     PlatformSync<Platform>* platform = nullptr;
-    PlatformSync<Platform>* enemy_platform = nullptr;
+    PlatformSync<Platform>* opponent_platform = nullptr;
     PlatformProcessor<Platform>* platform_processor = nullptr;
     QTimer timer;
     bool right_button = false;
     bool left_button = false;
+    bool isServer = false;
 
     const static size_t TIME_STEP = 50;
 

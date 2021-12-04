@@ -28,12 +28,8 @@ public:
 
     static float get_radius();
 
-    static void set_y_inversion(bool);
-
 private:
     float speed;
-
-    static bool y_inversion;
 };
 
 #endif // BALL_H
