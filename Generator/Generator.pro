@@ -48,8 +48,8 @@ DISTFILES += \
     interface.yxx
 
 folder.target = $$OUT_PWD/generated
-win32:folder.commands = $(CHK_DIR_EXISTS) $$shell_path(path/of/dir) & $(MKDIR) $$shell_path(path/of/dir)
-linux:folder.commands = $$shell_path(path/of/dir) & $(MKDIR) $$shell_path(path/of/dir)
+win32:folder.commands = $(CHK_DIR_EXISTS) $$shell_path($$OUT_PWD/generated) $(MKDIR) $$shell_path($$OUT_PWD/generated)
+linux:folder.commands = $$shell_path($$OUT_PWD/generated) & $(MKDIR) $$shell_path($$OUT_PWD/generated)
 QMAKE_EXTRA_TARGETS += folder
 
 flex.target = $$OUT_PWD/generated/interface.lexer.cpp
@@ -64,12 +64,12 @@ QMAKE_EXTRA_TARGETS += flex_header
 
 bison.target = $$OUT_PWD/generated/interface.parser.cpp
 bison.depends = $$PWD/interface.yxx
-bison.commands = win_bison.exe -d $$PWD/interface.yxx --output=$$OUT_PWD/generated/interface.parser.cpp
+bison.commands = $$PWD/../../bison/bin/win_bison.exe -d $$PWD/interface.yxx --output=$$OUT_PWD/generated/interface.parser.cpp
 QMAKE_EXTRA_TARGETS += bison
 
 bison_header.target = $$OUT_PWD/generated/interface.parser.hpp
 bison_header.depends = $$PWD/interface.yxx
-bison_header.commands = win_bison.exe -d $$PWD/interface.yxx --output=$$OUT_PWD/generated/interface.parser.cpp
+bison_header.commands = $$PWD/../../bison/bin/win_bison.exe -d $$PWD/interface.yxx --output=$$OUT_PWD/generated/interface.parser.cpp
 QMAKE_EXTRA_TARGETS += bison_header
 
 PRE_TARGETDEPS += \
@@ -79,10 +79,10 @@ PRE_TARGETDEPS += \
     $$OUT_PWD/generated/interface.parser.hpp \
     $$OUT_PWD/generated/interface.parser.cpp
 
-unix:!macx|win32: LIBS += -L$$PWD/../../RE-flex/vs/ -lreflex
-
+win32: LIBS += -L$$PWD/../../RE-flex/vs/ -lreflex
 win32: PRE_TARGETDEPS += $$PWD/../../RE-flex/vs/reflex.lib
-else:unix: PRE_TARGETDEPS += $$PWD/../../RE-flex/vs/libreflex.a
+unix:!macx: LIBS += -L$$PWD/../../RE-flex/ -lreflex
+unix: PRE_TARGETDEPS += $$PWD/../../RE-flex/libreflex.a
 
 MOC_DIR = $$OUT_PWD/moc
 OBJECTS_DIR = $$OUT_PWD/obj
