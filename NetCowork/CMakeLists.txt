@@ -10,9 +10,6 @@ set(CMAKE_AUTORCC ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Network REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Network REQUIRED)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 set(HEADER_DIR ${PROJECT_SOURCE_DIR}/include/)
 set(SOURCE_DIR ${PROJECT_SOURCE_DIR}/${LIBRARY_NAME}/)
 
@@ -39,3 +36,8 @@ foreach(class ${CLASSES})
 endforeach()
 
 add_library(${LIBRARY_NAME} ${SOURCES} ${HEADERS})
+
+target_link_libraries(${LIBRARY_NAME} PUBLIC
+    Qt::Core
+    Qt::Network
+)

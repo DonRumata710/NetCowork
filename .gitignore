@@ -3,4 +3,6 @@
 *.exe
 *.pro.user
 *.pro.user.*
+*.user
 *.autosave
+local.cmake

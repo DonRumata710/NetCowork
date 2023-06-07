@@ -2,6 +2,7 @@
 #define ENUMUTIL_H
 
 #include <unordered_map>
+#include <string>
 
 
 #define DECLARE_ENUM(VAL) VAL,
